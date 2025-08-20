@@ -1,0 +1,33 @@
+---
+
+# VARIABLES
+# =========
+# network_dns_search: 'domain.tld'                         # Optional; Default = '.'
+# nameservers:                                             # Optional; Default = ['8.8.8.8', '217.31.204.130', '1.1.1.1']
+#   - 8.8.4.4
+#   - 1.1.1.1
+#   - 8.8.8.8
+# network_failover_gw: 'True'                              # Optional; Default = False; install bash failover-gw.sh script to /srv/bin
+# network_failover_gw_primarygw: '1.2.3.4'                 # Required if only network_failover_gw is set to True; No Default, Set Primary GW
+# network_failover_gw_seconarygw: '4.3.2.1'                # Required if only network_failover_gw is set to True; No Default, Set Secondary GW
+# network_failover_gw_primaryip: '1.1.1.1'                 # Required if only network_failover_gw is set to True; No Default, Set Primary IP
+# network_failover_gw_emails: 'admin@domain.tld'           # Required if only network_failover_gw is set to True; No Default, Set Notify e-mails
+#
+#
+# VEREJNE DNS RESOLVERY
+# =====================
+#
+# nameservers:
+#   - 217.31.204.130  # NIC.CZ PRIMARNI DNS
+#   - 193.29.206.206  # NIC.CZ SEKUNDARNI DNS
+#   - 8.8.8.8         # GOOGLE PRIMARNI DNS
+#   - 8.8.4.4         # GOOGLE SEKUNDARNI DNS
+#
+# hosts:
+#   '10.10.10.1': host1 host2.domain.tld
+#
+# network_ip_aliases:                                       # Optional; Default = []
+#   - aliasname: 'eth0:0'
+#     ipaddr: '1.2.3.4'
+#     netmask: '255.255.255.255'
+#     broadcast: '1.2.3.4'

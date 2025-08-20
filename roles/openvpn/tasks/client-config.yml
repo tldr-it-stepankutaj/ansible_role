@@ -1,0 +1,30 @@
+---
+
+- name: "Gather ca certificate for {{openvpn_ccd_dict.key}}"
+  slurp: 
+    src: "/srv/easy-rsa/easyrsa3/{{ openvpn_ccd_dict.key }}/pki/ca.crt"
+  register: openvpn_client_ca
+  tags: openvpn_config
+
+- name: "Gather tls certificate for {{openvpn_ccd_dict.key}}"
+  slurp: 
+    src: "{{ openvpn_conf_dir | default('/etc/openvpn') }}/{{ openvpn_ccd_dict.key }}/ta.key"
+  register: openvpn_client_tls
+  tags: openvpn_config
+
+- name: "Create client config files for {{openvpn_ccd_dict.key}}"
+  include: "client-loop.yml"
+  with_dict: "{{ openvpn_ccd_dict.value}}" 
+  vars:
+    company: "{{ openvpn_ccd_dict.key }}"
+    client: "{{ openvpn_client_dict.key }}"
+  loop_control:
+    loop_var: openvpn_client_dict
+  tags: openvpn_config
+
+- name: "certificate vars cleanup for {{openvpn_ccd_dict.key}}"
+  set_fact:
+    openvpn_client_ca: nil
+    openvpn_client_tls: nil
+  tags: openvpn_config
+

@@ -1,0 +1,38 @@
+---
+# VARIABLES
+# =========
+#
+# ssh_port: 22                        # Optional; Default = 10029; set default port for SSH
+# ssh_PermitRootLogin: 'yes'          # Optional; Default = no; set boolean yes|no; allow root login to SSH connect
+# ssh_PasswordAuthentication: 'no'    # Optional; Default = no; set boolean yes|no; allow password for authentication to SSH
+# ssh_match:
+#  - type: Address
+#    value: 1.1.1.1
+#    directives:
+#      - PermitRootLogin yes
+#  - type: Address
+#    value: 2.2.2.2
+#    directives:
+#      - PermitRootLogin yes
+#
+# ssh_enable_internal_sftp: True
+# ssh_internal_sftp_users:
+#  "user1":
+#     ChrootDirectory: '/home/user1'  # default: ''
+#     ChrootDirectoryMode: '0750'     # default: '0750'
+#     ChrootDirectoryGroup: 'user1'   # default: 'username'
+#     PasswordAuthentication: 'yes'   # Optional; Default: 'no'; boolean
+#  "user2":
+#
+# ssh_internal_sftp_groups:
+#  "group1":
+#     ChrootDirectory: '/home/user1'  # default: ''
+#     ChrootDirectoryMode: '0750'     # default: '0750'
+#     ChrootDirectoryGroup: 'user1'   # default: 'username'
+#  "group2":
+#
+### NOTE:
+# If not set param ChrootDirectory for sftp users, will be set default %h
+
+ssh_internal_sftp_users: {}
+# ssh_enable_internal_sftp: False # optional

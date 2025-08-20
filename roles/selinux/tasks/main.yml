@@ -1,0 +1,25 @@
+---
+
+- name: Include os-specific vars
+  include_tasks: 'vars.yml'
+
+- name: Include distribution installation
+  include: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution }}.yml"
+        - "{{ ansible_os_family }}.yml"
+      skip: true
+
+#- name: install python bindings
+#  package: name={{ selinux_python_package }} state=present
+#  when: ansible_virtualization_type != "openvz" and ansible_virtualization_type != "lxc" and ansible_os_family == "RedHat"
+
+- name: Disabling selinux in config
+  selinux: state=disabled
+  when: ansible_virtualization_type != "openvz" and ansible_virtualization_type != "lxc" and ansible_os_family == "RedHat"
+  register: selinux_config_task
+
+- name: Disable selinux now
+  command: setenforce 0
+  when: ansible_virtualization_type != "openvz" and selinux_config_task.changed  and ansible_virtualization_type != "lxc" and ansible_os_family == "RedHat"

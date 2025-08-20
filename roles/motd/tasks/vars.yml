@@ -1,0 +1,39 @@
+---
+
+- name: include os family variables (level 1)
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - defaults.yml
+      paths:
+        # distro/redhat
+        # distro/debian
+        - distro/{{ ansible_os_family }}
+  failed_when: False
+
+- name: include os distribution variables (level 2)
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - defaults.yml
+      paths:
+        # distro/redhat/centos
+        # distro/debian/ubuntu
+        - distro/{{ ansible_os_family }}/{{ ansible_distribution }}
+      skip: true
+  failed_when: False
+
+- name: include os distribution release variables (level 3)
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - defaults.yml
+      paths:
+        # distro/redhat/centos/7
+        # distro/debian/ubuntu/12
+        - distro/{{ ansible_os_family }}/{{ ansible_distribution }}/{{ ansible_distribution_major_version }}
+        # distro/redhat/centos/core
+        # distro/debian/ubuntu/precise
+        - distro/{{ ansible_os_family }}/{{ ansible_distribution }}/{{ ansible_distribution_release }}
+      skip: true
+  failed_when: False

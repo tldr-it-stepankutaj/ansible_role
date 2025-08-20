@@ -1,0 +1,46 @@
+{{ ansible_managed }}
+### GENERAL ###
+client
+dev tun
+remote {{ openvpn_server_conf[company]['remote'] }}
+port {{ openvpn_server_conf[company]['port'] | default(1194) }}
+proto {{ openvpn_server_conf[company]['proto'] | default('tcp') }}
+nobind
+persist-key
+persist-tun
+<ca>
+{{ ca }}
+</ca>
+<cert>
+{{ crt }}
+</cert>
+<key>
+{{ key }}
+</key>
+remote-cert-tls server
+<tls-auth>
+{{ tls }}
+</tls-auth>
+key-direction 1
+comp-lzo
+verb 1
+cipher BF-CBC
+hand-window  30
+resolv-retry 40
+auth-nocache
+### END GENERAL ###
+
+### FOR WINDOWS CLIENT
+route-delay 2
+route-method exe
+### END FOR WINDOWS CLIENT ###
+
+### FOR LINUX CLIENT
+#user openvpn
+#group openvpn
+#log /var/log/openvpn_vpn.vsh.wtnet.cz.log
+# up client.up
+# plugin /usr/lib64/openvpn/plugins/openvpn-plugin-down-root.so "~/tmp/client/client.down"
+# script-security 2
+### END FOR LINUX CLIENT ###
+

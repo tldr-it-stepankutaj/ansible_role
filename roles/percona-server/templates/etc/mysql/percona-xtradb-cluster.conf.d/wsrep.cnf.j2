@@ -1,0 +1,38 @@
+[mysqld]
+# Path to Galera library
+wsrep_provider=/usr/lib/galera3/libgalera_smm.so
+
+# Cluster connection URL contains IPs of nodes
+#If no IP is found, this implies that a new cluster needs to be created,
+#in order to do that you need to bootstrap this node
+wsrep_cluster_address={{ percona_server_wsrep_cluster_address | default('gcomm://') }}
+
+# In order for Galera to work correctly binlog format should be ROW
+binlog_format=ROW
+
+# MyISAM storage engine has only experimental support
+default_storage_engine=InnoDB
+
+# Slave thread to use
+wsrep_slave_threads={{ percona_server_wsrep_slave_threads | default(8) }}
+
+wsrep_log_conflicts
+
+# This changes how InnoDB autoincrement locks are managed and is a requirement for Galera
+innodb_autoinc_lock_mode=2
+
+# Node IP address
+wsrep_node_address={{ percona_server_wsrep_node_address | default(ansible_default_ipv4.address, true) }}
+wsrep_node_name={{ percona_server_wsrep_node_name | default(inventory_hostname, true) }}
+
+# Cluster name
+wsrep_cluster_name={{ percona_server_wsrep_cluster_name | default('pxc-cluster', true) }}
+
+# pxc_strict_mode allowed values: DISABLED,PERMISSIVE,ENFORCING,MASTER
+pxc_strict_mode={{ percona_server_pxc_strict_mode | default('ENFORCING', true) }}
+
+# SST method
+wsrep_sst_method={{ percona_server_wsrep_sst_method | default('xtrabackup-v2', true) }}
+
+# Authentication for SST method
+wsrep_sst_auth="{{ percona_server_wsrep_sst_user | default('sst_user') }}:{{ percona_server_wsrep_sst_password | default('sst_password') }}"

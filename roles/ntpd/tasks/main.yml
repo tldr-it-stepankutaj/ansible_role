@@ -1,0 +1,27 @@
+---
+
+- name: Include os-specific vars
+  include_tasks: 'vars.yml'
+
+- name: Include distribution installation
+  include_tasks: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_system }}.yml"
+        - "{{ ansible_distribution }}.yml"
+        - "{{ ansible_os_family }}.yml"
+      skip: true
+
+- name: Set timezone
+  timezone: name={{ ntpd_timezone | default('Europe/Prague') }}
+  tags:
+    - timezone
+
+- name: create ntp config
+  template: src=ntp.conf.j2 dest={{ ntpd_config_path }} owner=root group={{ ntpd_config_group }} mode=0644
+  notify: restart ntpd
+
+- name: enable and start ntp service
+  service: name={{ ntpd_service_name }} state=started enabled=yes
+  when: ansible_os_family != "OpenBSD" and ansible_distribution_version | float > 5.9
+

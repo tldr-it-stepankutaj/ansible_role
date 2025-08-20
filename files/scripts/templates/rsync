@@ -1,0 +1,14 @@
+{% if ansible_os_family == "OpenBSD" %}#!/usr/local/bin/bash{% else %}#!/bin/bash{% endif %}
+
+# rsync wrapper to ommit vanished warnings
+
+rsync=$(which rsync)
+if [ -e $rsync ]; then
+  $rsync "$@" 2> >(grep -v vanished)
+  ret=$?
+  ((ret==24)) && exit 0 || exit $ret
+else
+  echo "Cannot find rsync executable"
+  exit 1
+fi
+

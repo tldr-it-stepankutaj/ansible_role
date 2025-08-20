@@ -1,0 +1,123 @@
+syntax on
+set tabstop=2
+set incsearch
+set ignorecase
+set mouse-=a                                        " automaticky zakazuje pouziti mysi
+set shiftwidth=2                                    " odsazení od levého okraje
+set expandtab                                       " vkladá místo 'tab' znaků mezery
+set hlsearch                                        " zvyrazni barvou hledany vzor
+filetype plugin indent on                           " Automaticky detekuje typy souborů
+set shell=/bin/bash                                 " nastaveni shellu pro prikaz `:sh`
+set pastetoggle=<F2>                                " klavesova zkratka pro vkladani textu ze schranky v insert modu(paste mode)
+set showcmd                                         " zobrazovani prikazu
+set showmode                                        " ukazuje mod, ve kterem se pracuje
+set ruler                                           " zobrazeni pozice kurzoru
+set bs=indent,eol,start                             " povolit backspace v insert modu
+set history=10000                                   " pamet historie nastavena na 10 tisic
+set autoread                                        " Detekuje když se změní soubor
+
+"### NASTAVENI CURSORLINE ###
+set cursorline
+hi cursorline cterm=NONE ctermbg=8 ctermfg=15
+"### END NASTAVENI CURSORLINE ###
+set background=dark                                 " nastaveni tmaveho pozadi
+
+nnoremap <silent> <Space> :silent nohl<Bar>echo<CR>
+
+let g:skip_defaults_vim = 1
+
+"set list
+"set listchars=tab:\ \ ,trail:.
+"set nocompatible                                     " vim nebude vi
+"filetype off
+
+
+
+
+""#PROBLEMATIC AREA can be found in _archive/vim role
+
+""set nocompatible                                     " vim nebude vi
+""filetype off
+""
+"""### INSTALACE A ODINSTALACE PLUGINU ###
+""set rtp+=~/.vim/bundle/Vundle.vim
+""call vundle#begin()
+""Plugin 'VundleVim/Vundle.vim'                       " Instalator pluginu
+"""#Plugin 'xoria256.vim'                               " Color schema
+""Plugin 'airblade/vim-gitgutter'                     " Zobrazovani zmen v gitu pomoci znaku +,-,! v levem panelu podle radku
+""Plugin 'ctrlpvim/ctrlp.vim'                         " Vyhledavání souborů pomocí ctrl+p
+""Plugin 'dkprice/vim-easygrep'                       " Vyhledávání regexp, slov, zanků v souborech
+""Plugin 'tpope/vim-fugitive'
+""Plugin 'tpope/vim-git'
+""Plugin 'scrooloose/nerdtree'
+""Plugin 'vim-airline'
+""Plugin 'SearchComplete'
+""call vundle#end()
+"""### END INSTALACE A ODINSTALACE PLUGINU ###
+""
+""filetype plugin indent on                           " Automaticky detekuje typy souborů
+""set shell=/bin/bash                       " nastaveni shellu pro prikaz `:sh`
+""set pastetoggle=<F2>                                " klavesova zkratka pro vkladani textu ze schranky v insert modu(paste mode)
+""set showcmd                                         " zobrazovani prikazu
+""set showmode                                        " ukazuje mod, ve kterem se pracuje
+""set ruler                                           " zobrazeni pozice kurzoru
+""set bs=indent,eol,start                             " povolit backspace v insert modu
+""set history=10000                                   " pamet historie nastavena na 10 tisic
+""set shiftwidth=2                                    " odsazení od levého okraje
+""set expandtab                                       " vkladá místo 'tab' znaků mezery
+""set tabstop=2
+""set ignorecase
+""nnoremap <C-a> ggmqvG"+y'q                          " klavesova zkratka ctrl+a = oznaci vsech text
+""nnoremap <F3> :NERDTree<CR>
+""noremap <C-o> :sh<CR>
+""set nu                                              " cislovani radku
+""nmap <C-N><C-N> :set invnumber<CR>                  " klávesová zkratka ctrl+nn = vypnutí nebo zapnutí číslování řádků
+""set mouse=a                                         " automaticky umoznit pouziti mysi
+""set mousehide                                       " skryt kurzor mysi pri psani
+""set autoread                                        " Detekuje když se změní soubor
+""set nofoldenable                                    " Zakazuje zdruzovani bloku
+""
+""if has("autocmd")
+""  " When editing a file, always jump to the last cursor position
+""  autocmd BufReadPost *
+""  \ if line("'\"") > 0 && line ("'\"") <= line("$") |
+""  \   exe "normal! g'\"" |
+""  \ endif
+""endif
+""
+""set ai
+""
+""" status radka
+""if has('statusline')
+""  set laststatus=2
+""endif
+""
+"""### NASTAVENI CURSORLINE ###
+""set cursorline
+""hi cursorline cterm=NONE ctermbg=8 ctermfg=15
+"""### END NASTAVENI CURSORLINE ###
+""
+"""### HIGHLIGHT EXTRA WHITESPACE ###
+""set list
+""set listchars=tab:\ \ ,trail:.
+""autocmd ColorScheme * highlight ExtraWhitespace ctermfg=red
+"""autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
+""autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+""autocmd InsertLeave * match ExtraWhitespace /\s\+$/
+""autocmd BufWinLeave * call clearmatches()
+"""### HIGHLIGHT EXTRA WHITESPACE ###
+""
+"""### NASTAVENI BAREVNE PALETY VIMU ###
+""set background=dark                                 " nastaveni tmaveho pozadi
+"""#colorscheme xoria256                                " nastaveni konkretniho barevneho schema
+""if &t_Co > 2 || has("gui_running")                  " pokud ma terminal vice barev nez 2 a nebo je vim spusten v gui modu:
+""  syntax on                                         " zapne zvyraznovani syntaxe
+""  set hlsearch                                      " zvyrazni barvou hledany vzor
+""  set t_Co=256                                      " nastaveni pro terminal, aby respektoval 256 barev
+""endif
+"""### END NASTAVENI BAREVNE PALETY VIMU ###
+""
+""" ### EASYGREP ###
+""let g:EasyGrepRecursive = 1
+""nnoremap <C-G> :Grep<SPACE>
+""" ### END ###

@@ -1,0 +1,81 @@
+---
+
+- name: Set distribution variables
+  include_vars: "{{ ansible_os_family }}.yml"
+  tags:
+    - iptables_config
+
+- name: uninstall firewalld
+  action: package state=absent name="firewalld"
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version | int > 6
+
+- name: install iptables packages for RedHat family > 6
+  action: package state=installed name="{{item}}"
+  with_items:
+    - "{{iptables_var.packages}}"
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version | int > 6
+
+- name: install iptables packages for RedHat family < 7
+  action: package state=installed name="{{item}}"
+  with_items:
+    - "{{iptables_var.packages_pre7}}"
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version | int < 7
+
+- name: set iptables config
+  action: template src={{item}} dest={{ iptables_var.config_destination }} mode=600
+  with_first_found:
+    - iptables.{{inventory_hostname}}
+    - iptables.{{host_group}}
+    - iptables
+  notify:
+    - "{{iptables_var.notify}}"
+  tags:
+    - iptables_config
+
+- name: set ip6tables config
+  action: template src={{item}} dest={{ ip6tables_var.config_destination }} mode=600
+  with_first_found:
+    - ip6tables.{{inventory_hostname}}
+    - ip6tables.{{host_group}}
+    - ip6tables
+  notify:
+    - "{{iptables_var.notify}}"
+  tags:
+    - iptables_config
+
+- name: Enable IP forwarding
+  sysctl: name=net.ipv4.ip_forward value=1 sysctl_set=yes state=present reload=yes
+  when: iptables.enable_nat is defined and iptables.enable_nat == True
+  tags: iptables_config
+
+- name: check configs
+  shell: "{{ item }}"
+  with_items:
+    - "iptables-restore -t < {{ iptables_var.config_destination }}"
+    - "ip6tables-restore -t < {{ ip6tables_var.config_destination }}"
+  register: result
+  changed_when: "result.rc != 0"
+  check_mode: no
+  tags:
+    - iptables_config
+
+- name: enable and start service
+  service: name="{{ item }}" state=started enabled=yes
+  with_items:
+    - "{{ iptables_var.service_name }}"
+    - "{{ ip6tables_var.service_name }}"
+  when: ansible_os_family == 'RedHat'
+
+- name: enable and start service
+  copy: src=init.iptables dest=/etc/network/if-pre-up.d/iptables owner=root group=root mode=0700
+  when: ansible_os_family == 'Debian'
+
+  #- name: make rsyslog config to create separate log file for iptables
+  #  copy: src=rsyslog-iptables.conf dest=/etc/rsyslog.d/iptables.conf owner=root group=root mode=0644
+  #  notify: restart rsyslog
+  #  tags: iptables_rsyslog
+  #
+  #- name: make logrotate config for rotating iptables logs
+  #  copy: src=logrotate-iptables dest=/etc/logrotate.d/iptables owner=root group=root mode=0644
+  #  tags: iptables_logrotate
+  #

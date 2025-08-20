@@ -1,0 +1,5 @@
+---
+
+- name: install packages for OpenBSD
+  openbsd_pkg: name=openvpn state=present
+  when: ansible_os_family == "OpenBSD"

@@ -1,0 +1,4 @@
+### !!! NEUPRAVOVAT, SOUBOR JE KOPIROVAN PRES ANSIBLE !!! ###
+@include common-auth
+@include common-account
+account required pam_access.so accessfile=/etc/security/access_openvpn.conf

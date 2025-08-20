@@ -1,0 +1,56 @@
+export TERM=linux
+export PAGER="less"
+export EDITOR="vim"
+
+[ -z "$PS1" ] && return; # If not running interactively, don't do anything
+
+# Nastaveni bash promptu
+export PS1='\[\033[1;34m\]\t \[\033[0;36m\]\u@\h \[\033[0;32m\]\w \[\033[1;31m\]${?##0}\[\033[1;34m\]\$\[\033[0m\] ';
+export PS2="\[\033[1;34m\]>\[\033[0m\] ";
+export PS4='\[\033[1;34m\]+${BASH_SOURCE}:${LINENO}${FUNCNAME[0]:+ [${FUNCNAME[0]}()]}: \[\033[0m\]';
+
+# don't put duplicate lines in the history. See bash(1) for more options
+# ... or force ignoredups and ignorespace
+HISTCONTROL=ignoredups:ignorespace
+
+# append to the history file, don't overwrite it
+shopt -s histappend
+
+# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+HISTSIZE=100000
+HISTFILESIZE=100000
+HISTTIMEFORMAT="[$(tput setaf 6)%F %T$(tput sgr0)]: " # colorful date
+
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+
+alias ll='colorls -Gal'
+alias ls='colorls -G'
+alias vipf='vim /etc/pf.conf && pfctl -nf /etc/pf.conf'
+alias pfload='pfctl -nf /etc/pf.conf && pfctl -f /etc/pf.conf'
+
+function vpnip {
+  vpn_servers=($(find /etc/openvpn -type f -iname *.conf -exec basename {} \;))
+
+  select server in ${vpn_servers[*]}; do
+    ip_net=$(grep -r '^server ' /etc/openvpn/"$server" | awk '{print $2}' | cut -d "." -f1-3)
+    my_pwd=$(echo $PWD)
+    cd /etc/openvpn/ccd
+    listvpn=$(grep -ri ifconfig * | tr : " " | awk '{printf "%-20s %s\n", $1,$3}' | sort -t . -k4n | uniq)
+    array=($(echo -n "$listvpn" | awk -F '.' '{print $4}'))
+    cd $my_pwd
+    i=6
+    x=0
+    while [ $i = "${array[$x]}" ]; do
+      ((i +=4))
+      ((x +=1))
+      oktet=$i
+    done
+    echo -n "$listvpn"
+    echo  ""
+    echo  ""
+    echo  "Prvni volna IP:      "$ip_net"."${oktet}""
+    break
+  done
+}

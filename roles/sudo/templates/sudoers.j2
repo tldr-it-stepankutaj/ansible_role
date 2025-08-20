@@ -1,0 +1,24 @@
+{{ ansible_managed }}
+
+Defaults          {% if sudoers_requiretty | default(True) == False %}!{% endif %}requiretty
+Defaults          secure_path = {{ sudo_secure_path | default('/usr/local/bin:/usr/local/sbin:/sbin:/bin:/usr/sbin:/usr/bin') }}
+Defaults:{% if ( ansible_os_family == 'RedHat' or ansible_os_family == 'FreeBSD' ) %}%wheel{% else %}%sudo{% endif %}   !requiretty
+#Defaults          logfile="/var/log/sudo.log"
+#Defaults          log_input, log_output
+Defaults          !visiblepw
+Defaults          always_set_home
+Defaults          mail_badpass
+{% if ansible_os_family == 'RedHat' or ansible_os_family == 'Debian' %}
+Defaults          env_reset
+Defaults          env_keep +=SSH_AUTH_SOCK
+Defaults          env_keep =  "COLORS DISPLAY HOSTNAME HISTSIZE INPUTRC KDEDIR LS_COLORS"
+Defaults          env_keep += "MAIL PS1 PS2 QTDIR USERNAME LANG LC_ADDRESS LC_CTYPE"
+Defaults          env_keep += "LC_COLLATE LC_IDENTIFICATION LC_MEASUREMENT LC_MESSAGES"
+Defaults          env_keep += "LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE"
+Defaults          env_keep += "LC_TIME LC_ALL LANGUAGE LINGUAS _XKB_CHARSET XAUTHORITY"
+{% endif %}
+
+root      ALL=(ALL) ALL
+
+{% if ( ansible_os_family == 'RedHat' or ansible_os_family == 'FreeBSD' ) %}%wheel{% else %}%sudo{% endif %}    ALL=(ALL:ALL) NOPASSWD:ALL
+#includedir {{ sudo_custom_conf_dir }}

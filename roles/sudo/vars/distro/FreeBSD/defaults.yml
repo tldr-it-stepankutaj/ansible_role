@@ -1,0 +1,6 @@
+---
+
+sudo_custom_conf_dir: '/usr/local/etc/sudoers.d'
+sudo_global_conf: '/usr/local/etc/sudoers'
+sudo_visudo_bin: '/usr/local/sbin/visudo'
+sudo_system_root_group: 'wheel'

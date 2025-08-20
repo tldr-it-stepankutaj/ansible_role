@@ -1,0 +1,110 @@
+---
+
+- name: Include os-specific vars
+  include_tasks: 'vars.yml'
+
+- name: Install EPEL repo
+  package: name=epel-release state=present
+  when: ansible_os_family == "RedHat" and ansible_distribution != 'Fedora'
+
+- name: install base packages for Debian
+  package: name="{{ item }}" state=present
+  when: ansible_os_family == "Debian"
+  with_items:
+    - bash-completion
+    - bc
+    - curl
+    - gcc
+    - git
+    - htop
+    - lsof
+    - man
+    - mc
+    - net-tools
+    - rsync
+    - screen
+    - sudo
+    - tcpdump
+    - telnet
+    - traceroute
+    - unzip
+    - wget
+    - bzip2
+    - gpg
+    - python3-pip
+    - tree
+    - iptables
+    - iptables-persistent
+    - "{{ base_distribution_packages }}"
+
+- name: install base packages for Redhat
+  package: name="{{ item }}" state=present
+  when: ansible_os_family == "RedHat"
+  with_items:
+    - atop
+    - bash-completion
+    - bc
+    - curl
+    - gcc
+    - git
+    - htop
+    - lsof
+    - lvm2
+    - man
+    - mc
+    - mosh
+    - net-tools
+    - rsync
+    - screen
+    - sudo
+    - tcpdump
+    - telnet
+    - tmux
+    - traceroute
+    - unzip
+    - wget
+    - bzip2
+    - mlocate
+    - dkms
+    - "{{ base_distribution_packages }}"
+
+- name: install group packages
+  package: name="{{ item }}" state=present
+  with_items: "{{ group_packages | default([]) }}"
+  when: item | count > 0
+
+- name: install host packages
+  package: name="{{ item }}" state=present
+  with_items: "{{ host_packages | default([]) }}"
+  when: item | count > 0
+
+- name: default pkgs to remove
+  action: package state=removed name="{{item}}"
+  when: ansible_os_family == "RedHat"
+  with_items:
+  #- firewalld
+  - PackageKit*
+  - sendmail
+
+- name: copy bashrc file for root user
+  copy: src=bashrc_{{ ansible_os_family }} dest=/root/.bashrc owner=root group=root mode=0640
+  failed_when: false
+  tags:
+    - bashrc
+
+- name: Copy user scripts to /srv/bin
+  copy: src=../../files/scripts/files/ dest=/srv/bin/ owner=root mode=0755
+  tags:
+    - base_scripts
+
+- name: Make user scripts to /srv/bin from templates
+  template: src="../../files/scripts/templates/{{item}}" dest="/srv/bin/{{item}}" owner=root mode=0755
+  with_items:
+    - rsync
+  tags:
+    - base_scripts
+    - base_scripts_templates
+
+
+- name: make user vim config
+  template: src=vimrc.j2 dest=/root/.vimrc owner=root group=root mode=0600

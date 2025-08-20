@@ -1,0 +1,19 @@
+{{ ansible_managed }}
+pid file = /var/run/rsyncd.pid
+syslog facility = daemon
+dont compress = *.gz *.tgz *.zip *.z *.rpm *.deb *.bz2 *.iso
+use chroot = true
+transfer logging = false
+{% if rsyncd_exclude is defined %}
+exclude = {{ rsyncd_exclude }}
+{% endif %}
+log file = /var/log/rsyncd.log
+
+{% for sectionitems in rsyncd_section_config %}
+[ {{ sectionitems.section }} ]
+{% if sectionitems.options is defined -%}
+{% for option in sectionitems.options %}
+  {{ option }}
+{% endfor -%}
+{% endif %}
+{% endfor -%}

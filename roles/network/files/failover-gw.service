@@ -1,0 +1,10 @@
+[Unit]
+Description=Zajistuje prepinani na backup providera
+After=networking.service
+
+[Service]
+ExecStart=/bin/bash -c 'while true; do /srv/bin/failover-gw.sh; done'
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

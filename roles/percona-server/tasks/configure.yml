@@ -1,0 +1,117 @@
+# tasks file
+---
+- name: configure | copy certificate files
+  copy:
+    src: "{{ item.value.src }}"
+    dest: "{{ item.value.dest }}"
+    owner: "{{ item.value.owner | default('root') }}"
+    group: "{{ item.value.group | default('mysql') }}"
+    mode: "{{ item.value.mode | default('0640') }}"
+  with_dict: "{{ percona_server_ssl_map }}"
+  notify: restart percona-server
+  tags:
+    - percona-server-configure-copy-certificate-files
+
+- block:
+    - name: configure | service | stop
+      service:
+        name: mysql
+        state: stopped
+      tags:
+        - percona-server-configure-first-run-service-stop
+
+    - name: configure | remove (excessive) configuration files
+      file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - /etc/mysql/percona-server.cnf
+        - /etc/mysql/percona-server.conf.d
+      tags:
+        - percona-server-configure-first-run-cleanup
+  when: _mysqld_installed.rc != 0
+  tags:
+    - percona-server-configure-first-run
+
+- name: configure | update (global) configuration file
+  template:
+    src: "{{ percona_server_etc_mysql_my_cnf.lstrip('/') }}.j2"
+    dest: "{{ percona_server_etc_mysql_my_cnf }}"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart percona-server
+  tags:
+    - percona-server-configure-global-my-cnf
+
+- block:
+    - name: configure | service | start
+      service:
+        name: mysql
+        state: started
+      tags:
+        - percona-server-configure-first-run-service-start
+  when: _mysqld_installed.rc != 0
+  tags:
+    - percona-server-configure-first-run
+
+- name: configure | update (root) configuration file
+  template:
+    src: root/.my.cnf.j2
+    dest: '~root/.my.cnf'
+    owner: root
+    group: root
+    mode: 0600
+  when: percona_server_user_root_cnf_manage
+  tags:
+    - percona-server-configure-root-my-cnf
+
+### Percona Xtradb Cluster
+
+- name: configure | update (percona-xtradb-cluster) configuration file
+  template:
+    src: etc/mysql/percona-xtradb-cluster.conf.d/wsrep.cnf.j2
+    dest: /etc/mysql/percona-xtradb-cluster.conf.d/wsrep.cnf
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart percona-server
+  tags:
+    - percona-xtradb-cluster
+    - percona-server-configure-cluster-wsrep-cnf
+
+- name: Initial Percona XtraDB Cluster Primary Node
+  block:
+    - name: cluster | service | stop
+      service:
+        name: mysql
+        state: stopped
+
+    - name: cluster | config | set grastate.dat file
+      lineinfile:
+        dest: /var/lib/mysql/grastate.dat
+        regexp: 'safe_to_bootstrap:(.*)$'
+        line: 'safe_to_bootstrap: 1'
+        state: present
+      when: is_percona_server_wsrep_primary_node
+
+    - name: cluster | service | start primary node
+      command: service mysql bootstrap-pxc
+      when: is_percona_server_wsrep_primary_node
+      register: cluster_service_start_primary_node
+
+    - name: cluster | service | init start
+      command: /etc/init.d/mysql bootstrap-pxc
+      become: yes
+      when: is_percona_server_wsrep_primary_node
+
+    - name: cluster | service | start
+      service:
+        name: mysql
+        state: started
+      when: not is_percona_server_wsrep_primary_node
+
+  when: _mysqld_installed.rc != 0 or is_percona_server_wsrep_force_initial
+  tags:
+    - percona-xtradb-cluster
+    - percona-server-cluster-initial

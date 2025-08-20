@@ -1,0 +1,5 @@
+---
+
+base_distribution_packages:
+  - yum-plugin-changelog
+  - libselinux-python

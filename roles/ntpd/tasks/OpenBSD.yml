@@ -1,0 +1,12 @@
+---
+
+#- name: enable ntp service
+#  lineinfile:
+#    dest=/etc/rc.conf.local
+#    backup=yes
+#    line='ntpd_flags="{{ntpd_flags}}"'
+#    regexp='^ntpd_flags='
+#    state=present
+#    insertafter=EOF
+#    create=True
+#  notify: restart ntpd

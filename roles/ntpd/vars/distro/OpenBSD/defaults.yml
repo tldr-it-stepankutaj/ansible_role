@@ -1,0 +1,6 @@
+---
+
+ntpd_config_group: wheel
+ntpd_config_path: /etc/ntpd.conf
+ntpd_service_name: ntpd
+

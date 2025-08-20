@@ -1,0 +1,9 @@
+---
+sudo_system_root_group: wheel
+sudo_visudo_bin: /usr/local/sbin/visudo
+
+sudo_template:
+  zabbix:
+    regexp: '^_zabbix'
+    line: '_zabbix ALL=NOPASSWD:/sbin/bioctl'
+

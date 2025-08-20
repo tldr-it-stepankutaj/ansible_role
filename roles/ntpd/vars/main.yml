@@ -1,0 +1,5 @@
+---
+
+ntpd_driftfile: '/var/lib/ntp/drift'
+ntpd_leapfile: '/var/lib/ntp/ntpd.leap-seconds.list'
+ntpd_keys: '/etc/ntp/keys'

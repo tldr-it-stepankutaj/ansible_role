@@ -1,0 +1,17 @@
+#!/bin/bash
+mailto='admin@wtnet.cz'
+#source /root/sshagent >>/dev/null
+export ANSIBLE_HOST_KEY_CHECKING=False
+export HOME=/home/backuppc
+export ANSIBLE_VAULT_PASSWORD_FILE=~/.ansible_vault.txt
+#export ANSIBLE_SSH_PIPELINING=False
+cd /srv/ansible
+git pull
+git submodule init
+git submodule update
+/srv/ansible/scripts/ansible-playbook-check-diff |& grep ok=
+ansible-playbook playbooks/base.yml -D -C |& grep ok=
+
+# Send a email with failed or changed from the above check/diff run
+/srv/ansible/scripts/logview -d today -s CHECK_DIFF:CHANGED -s CHECK_DIFF:FAILED | mailx -s "Ansible changed/failed actions from check/diff daily run" admin@wtnet.cz
+

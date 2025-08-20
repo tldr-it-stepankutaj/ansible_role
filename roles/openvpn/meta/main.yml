@@ -1,0 +1,7 @@
+---
+
+#dependencies:
+#  - { role: sysusers, "sysusers_users": [{"name": "asterisk", "comment": "Asterisk user", "createhome": false}]}
+#  {{ if openvpn_easyrsa_server == 'localhost' }}
+#  - { role: easyrsa, "easyrsa_installdir": "/srv/easy-rsa" }
+#  {{ endif }} 

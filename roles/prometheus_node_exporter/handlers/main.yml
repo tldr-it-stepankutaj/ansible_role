@@ -1,0 +1,9 @@
+---
+- name: restart prometheus-node-exporter
+  service: name=prometheus-node-exporter state=restarted
+
+- name: restart prometheus-mysqld-exporter
+  service: name=prometheus-mysqld-exporter state=restarted
+
+- name: restart prometheus-postgres-exporter
+  service: name=prometheus-postgres-exporter state=restarted

@@ -1,0 +1,8 @@
+---
+
+ntpd_driftfile: '/var/db/ntpd.drift'
+ntpd_config_group: 'wheel'
+ntpd_config_path: '/etc/ntp.conf'
+ntpd_service_name: 'ntpd'
+ntpd_leapfile: '/var/db/ntpd.leap-seconds.list'
+ntpd_keys: '/etc/ntp.keys'

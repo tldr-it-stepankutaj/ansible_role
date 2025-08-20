@@ -1,0 +1,8 @@
+---
+htpasswd_httpd_utils: 'apache2-utils'
+
+htpasswd_packages:
+  - python-passlib
+  - python-pip
+  - "{{ htpasswd_httpd_utils }}"
+

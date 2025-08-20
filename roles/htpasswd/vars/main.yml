@@ -1,0 +1,5 @@
+---
+
+htpasswd_path_dir: '/etc/nginx/passwords'
+htpasswd_system_root_group: 'root'
+

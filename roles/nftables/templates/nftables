@@ -1,0 +1,123 @@
+{{ ansible_managed }}
+
+flush ruleset
+
+define trusted_hosts = { {{ nftables.trusted_hosts | join(', ') }} }
+{% if nftables.tcp_ports is defined and nftables.tcp_ports | length > 0 %}
+define tcp_ports = { {{ nftables.tcp_ports | join(', ') }} }
+{% endif %}
+{% if nftables.udp_ports is defined and nftables.udp_ports | length > 0 %}
+define udp_ports = { {{ nftables.udp_ports | join(', ') }} }
+{% endif %}
+
+table inet filter {
+  chain input {
+    type filter hook input priority 0; policy accept;
+
+    ct state established,related counter accept
+    iif lo accept
+
+    #accept trusted hosts
+    ip saddr $trusted_hosts accept 
+
+    # if the connection is NEW and is not SYN then drop
+    tcp flags != syn ct state new log prefix "FW: FIRST PACKET IS NOT SYN" drop 
+
+    # new and sending FIN the connection? DROP!
+    tcp flags & (fin|syn) == (fin|syn) log prefix "FW: TCP SCANNER" drop 
+
+    # accept ICMP echo-request type
+    ip protocol icmp icmp type echo-request limit rate 3/second counter accept 
+    ip protocol icmp icmp type echo-request counter drop
+    ip6 nexthdr icmpv6 icmpv6 type echo-request limit rate 3/second counter accept
+    ip6 nexthdr icmpv6 icmpv6 type echo-request counter drop
+
+    ip protocol icmp icmp type { destination-unreachable, router-advertisement, time-exceeded, parameter-problem } accept
+    ip6 nexthdr icmpv6 icmpv6 type { destination-unreachable, packet-too-big, time-exceeded, parameter-problem, echo-reply, nd-router-advert, nd-neighbor-solicit, nd-neighbor-advert } accept
+
+{% if nftables.zabbix_server_ip is defined %}
+# allow zabbix server
+    tcp dport 10050 ct state new tcp flags & (syn | ack ) == syn saddr {{ nftables.zabbix_server_ip }} accept
+{% endif %}
+
+{% if nftables.permit_public_ssh | default(True) %}
+    # allow public access to ssh
+    tcp dport {{ nftables.ssh_port | default('10029') }} ct state new tcp flags & (syn | ack) == syn counter accept
+{% endif %}
+
+{% if nftables.tcp_ports is defined and nftables.tcp_ports | length > 0 %}
+    # Allow input tcp ports
+    tcp dport $tcp_ports ct state new accept
+{% endif %}
+
+{% if nftables.udp_ports is defined and nftables.udp_ports | length > 0 %}
+    # Allow input udp ports
+    udp dport $udp_ports accept
+{% endif %}
+
+{% if nftables.custom_input_rules is defined %}
+    # custom rules
+{% for rule in nftables.custom_input_rules %}
+    {{ rule }}
+{% endfor %}
+{% endif %}
+    
+    # reject rest
+    reject with icmp type host-unreachable
+    reject with icmpv6 type no-route
+  }
+
+  chain forward {
+    type filter hook forward priority 0; policy accept;
+
+    ct state established,related counter accept
+
+{% if nftables.custom_forward_rules is defined %}
+    # custom rules
+{% for rule in nftables.custom_forward_rules %}
+    {{ rule }}
+{% endfor %}
+{% endif %}
+    reject with icmp type host-unreachable
+    reject with icmpv6 type no-route
+  }
+
+  chain output {
+    type filter hook output priority 0; policy accept;
+
+    ct state established,related counter accept
+{% if nftables.custom_output_rules is defined %}
+    # custom rules
+{% for rule in nftables.custom_output_rules %}
+    {{ rule }}
+{% endfor %}
+{% endif %}
+  }
+}
+
+
+
+{% if nftables.enable_nat is defined and nftables.enable_nat == True %}
+table ip nat {
+
+        chain prerouting    {
+    type nat hook prerouting priority -100;
+{% if nftables.custom_prerouting_rules is defined %}
+{% for rule in nftables.custom_prerouting_rules %}
+{{ rule }}
+{% endfor %}
+{% endif %}
+  }
+
+        chain postrouting               {
+    type nat hook postrouting priority 100;
+{% if nftables.custom_postrouting_rules is defined %}
+{% for rule in nftables.custom_postrouting_rules %}
+{{ rule }}
+{% endfor %}
+{% endif %}
+  }
+}
+{% endif %}
+
+

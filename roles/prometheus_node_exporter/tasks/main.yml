@@ -1,0 +1,31 @@
+---
+
+
+- name: Install prometheus-node-exporter.
+  package:
+    name: "prometheus-node-exporter"
+    state: "present"
+
+- name: Update prometheus-node-exporter config
+  template:
+    src: prometheus-node-exporter.j2
+    dest: "/etc/default/prometheus-node-exporter"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart prometheus-node-exporter
+
+
+- name: Include mysqld.yml for percona
+  ansible.builtin.include_tasks: "mysqld.yml"
+  when: "'percona' in group_names"
+
+- name: Include postgres.yml for postgres
+  ansible.builtin.include_tasks: "postgres.yml"
+  when: "'postgres' in group_names"
+
+
+- name: Remove openipmi.
+  package:
+    name: "openipmi"
+    state: "absent"

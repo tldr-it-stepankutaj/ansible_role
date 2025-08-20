@@ -1,0 +1,11 @@
+---
+
+# DESCRIPTION
+#
+#
+# VARIABLES
+#
+# ntpd_timezone: Europe/Prague     # Optional; Default = 'Europe/Prague'; set timezone
+# ntpd_flags: '-s'                 # Optional; Use only for OpenBSD distribution
+# ntpd_server: hostname.tld        # Optional; Default = tik.cesnet.cz a tak.cesnet.cz
+

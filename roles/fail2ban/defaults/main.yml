@@ -1,0 +1,24 @@
+---
+
+# EXAMPLE:
+# Vyzadovane nastaveni ve VARS hostu:
+#
+# Minimum staci:
+# fail2ban_jails:
+#   sshd: []
+#
+# Dale muzeme nastavovat dle libosti:
+# fail2ban_jails:
+#   sshd:
+#     - port = 29
+#
+# POZOR: pro CentOS ma nazev jails `sshd` pro Ubuntu `ssh`
+#
+# TODO:
+# najit podminku jestli variable neni pole do jail configu, aby ve variables nemuselo byt prazne pole
+
+fail2ban_ignoreip: "127.0.0.1/8"
+fail2ban_bantime: 600
+fail2ban_destemail: "root@{{inventory_hostname}}"
+fail2ban_sender: "fail2ban@{{inventory_hostname}}"
+

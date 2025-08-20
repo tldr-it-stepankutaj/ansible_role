@@ -1,0 +1,95 @@
+---
+- name: set default password fact
+  set_fact:
+    sysusers_default_root_password: "{{ default_bsd_password }}"
+  when: ansible_os_family == "OpenBSD" and default_bsd_password is defined
+  tags:
+    - sysusers_config
+
+- name: set default password fact
+  set_fact:
+    sysusers_default_root_password: "{{ default_linux_password }}"
+  when: ansible_os_family != "OpenBSD" and default_linux_password is defined
+  tags:
+    - sysusers_config
+
+- name: check if bash is installed
+  command: which bash
+  register: bash_installed
+  ignore_errors: yes
+  changed_when: false
+  failed_when: false
+  check_mode: no
+
+- name: add group
+  group:
+    name: "{{ item.key }}"
+    system: "{{ item.system | default(omit) }}"
+    gid: "{{ item.gid | default(omit) }}"
+    state: "{{ item.state | default('present') }}"
+  with_dict: '{{ sysusers_groups }}'
+  when: sysusers_groups | count > 0
+  tags:
+    - sysusers_config
+
+- name: add user
+  user:
+    name: "{{ item.value.name }}"
+    groups: "{{ ','.join(item.value.groups|default([])) }}"
+    append: "{{ item.value.append | default(omit) }}"
+    password: "{% if sysusers_default_root_password is defined and item.value.name == 'root' %}{{ item.value.password | default(sysusers_default_root_password) or omit }}{% else %}{{ item.value.password | default(omit) }}{% endif %}"
+    comment: "{{ item.value.comment | default(omit) }}"
+    shell: "{% if item.value.shell is defined %}{{ item.value.shell}}{% else %}{% if not bash_installed.changed and ansible_os_family != 'RedHat' %}{% if ansible_distribution_major_version is defined and ansible_distribution_major_version |int == 7 and ansible_os_family == 'RedHat' %}{{ omit}}{% else %}{{ bash_installed.stdout }}{% endif %}{% else %}{{ omit }}{% endif %}{% endif %}"
+    uid: "{{ item.value.uid | default(omit) }}"
+    home: "{{ item.value.home | default(omit) }}"
+    createhome: "{{ item.value.createhome | default('yes') }}"
+    system: "{{ item.value.system | default(omit) }}"
+    group: "{{ item.value.group | default(omit) }}"
+    non_unique: "{{ item.value.non_unique | default(omit) }}"
+    generate_ssh_key: "{{ item.value.generate_ssh_key | default(omit) }}"
+    state: '{{item.value.state | default("present")}}'
+    remove: '{{item.value.remove | default(False)}}'
+  with_dict: '{{ sysusers_users }}'
+  tags:
+    - sysusers_config
+
+- name: add pub ssh key
+  authorized_key:
+    user: "{{item.0.name }}"
+    key: "{{item.1}}"
+    path: "{% if item.0.home is defined %}{{item.0.home}}/.ssh/authorized_keys{% else %}{% if item.0.name == 'root' %}/{{item.0.name}}/.ssh/authorized_keys{% else %}/home/{{item.0.name}}/.ssh/authorized_keys{% endif %}{% endif %}"
+  with_subelements:
+    - '{{ sysusers_users }}'
+    - ssh_keys
+    - flags:
+      skip_missing: True
+  when: item.0.state is not defined or item.0.state == 'present'
+  tags:
+    - sysusers_config
+
+- name: Adding user's private key by host vars
+  copy:
+    content:  "{{ item.1 }}"
+    dest: "{{ item.0.home | default('/home/' + item.0.name) }}/.ssh/id_rsa"
+    owner: "{{ item.0.name }}"
+    group: "{{ item.0.group | default(item.0.name) }}"
+    mode: '0600'
+  with_subelements:
+    - "{{ sysusers_users }}"
+    - ssh_private_key
+    - flags:
+      skip_missing: True
+  when: item.0.state is not defined or item.0.state == 'present'
+  tags:
+    - sysusers_config
+
+
+
+- name: Manage root .ssh/authorized_keys file
+  ansible.builtin.template:
+    src: root_authorized_keys
+    dest: /root/.ssh/authorized_keys
+    owner: root
+    group: root
+    mode: '0600'
+  when: company_root_ssh_keys is defined

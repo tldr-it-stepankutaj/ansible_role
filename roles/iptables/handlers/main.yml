@@ -1,0 +1,20 @@
+---
+
+- name: reload iptables
+  service: name={{ item }} state=reloaded
+  with_items:
+    - "{{ iptables_var.service_name }}"
+    - "{{ ip6tables_var.service_name }}"
+  when: ansible_os_family == 'RedHat'
+
+
+- name: apply rules
+  shell: "{{ item }}"
+  with_items:
+    - "iptables-restore < {{ iptables_var.config_destination }}"
+    - "ip6tables-restore < {{ ip6tables_var.config_destination }}"
+  when: ansible_os_family == 'Debian'
+
+- name: restart rsyslog
+  service: name=rsyslog state=restarted
+

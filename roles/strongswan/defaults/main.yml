@@ -1,0 +1,7 @@
+---
+
+# VARIABLES
+# =========
+#
+# strongswan_checkout_dir: '/srv/src'                       # Optional; Default = /usr/local/src/strongswan
+# stronswan_version: '5.7.2'                                # Require; No Default

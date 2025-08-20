@@ -1,0 +1,154 @@
+---
+
+- name: Include os-specific vars
+  include: 'vars.yml'
+
+- name: Include distribution installation
+  include: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+
+- name: installing dependencies for easyrsa
+  package: name={{ item }} state=present
+  with_items: 
+    - "{{ easyrsa_dist_dependencies }}"
+    
+- name: installing pexpect package with pip
+  pip: name=pexpect
+
+- name: installing easyrsa
+  git: repo=https://github.com/OpenVPN/easy-rsa.git dest={{ easyrsa_installdir }} update=no
+
+- name: create config vars for easyrsa
+  template: src='vars.j2' dest={{ easyrsa_installdir }}/easyrsa3/{{ item.name }}.vars
+  with_items:
+    - "{{ easyrsa.pki }}"
+  when: easyrsa.pki is defined and easyrsa.pki | length > 0
+
+- name: creating pki dir in easyrsa
+  shell: ./easyrsa --vars=./{{ item.name }}.vars init-pki chdir={{ easyrsa_installdir }}/easyrsa3 creates={{ easyrsa_installdir }}/easyrsa3/{{ item.name }}
+  with_items:
+    - "{{ easyrsa.pki }}"
+  when: easyrsa.pki is defined and easyrsa.pki | length > 0
+
+- name: build CA cert
+  expect:
+    command: "./easyrsa --vars=./{{ item.name }}.vars build-ca"
+    chdir: "{{ easyrsa_installdir }}/easyrsa3"
+    creates: "{{ easyrsa_installdir }}/easyrsa3/{{ item.name }}/pki/ca.crt"
+    responses:
+      'Enter New CA Key Passphrase': "{{ item.cacerts.password }}"
+      'Country Name': "{{ item.cacerts.country_name | default(easyrsa_ca_country_name_default) }}"
+      'State or Province Name': "{{ item.cacerts.state | default(easyrsa_ca_state_default) }}"
+      'Locality Name': "{{ item.cacerts.city | default(easyrsa_ca_city_default) }}"
+      'Organization Name': "{{ item.cacerts.org_name | default(easyrsa_ca_org_name_default) }}"
+      'Organizational Unit Name': "{{ item.cacerts.org_unit | default(easyrsa_ca_org_unit_default) }}"
+      'Common Name': "{{ item.cacerts.cn }}"
+      'Email Address': "{{ item.cacerts.email | default(easyrsa_ca_email_default) }}"
+  with_items:
+    - "{{ easyrsa.pki }}"
+  when: easyrsa.pki is defined and easyrsa.pki | length > 0 and item.cacerts is defined
+
+- name: generate request server cert
+  expect:
+    command: "./easyrsa --vars=./{{ item.0.name }}.vars gen-req {{ item.1.cn }} nopass"
+    chdir: "{{ easyrsa_installdir }}/easyrsa3"
+    creates: "{{ easyrsa_installdir }}/easyrsa3/{{ item.0.name }}/pki/reqs/{{ item.1.cn }}.req"
+    responses:
+      'Country Name': "{{ item.1.country_name | default(easyrsa_server_country_name_default) }}"
+      'State or Province Name': "{{ item.1.state | default(easyrsa_server_state_default) }}"
+      'Locality Name': "{{ item.1.city | default(easyrsa_server_city_default) }}"
+      'Organization Name': "{{ item.1.org_name | default(easyrsa_server_org_name_default) }}"
+      'Organizational Unit Name': "{{ item.1.org_unit | default(easyrsa_server_org_unit_default) }}"
+      'Common Name': "{{ item.1.cn }}"
+      'Email Address': "{{ item.1.email | default(easyrsa_server_email_default) }}"
+  with_subelements:
+    - "{{ easyrsa.pki }}"
+    - servercerts
+    - flags:
+      skip_missing: True
+  when: easyrsa.pki is defined and easyrsa.pki | length > 0
+
+- name: sign server cert
+  expect:
+    command: "./easyrsa --vars=./{{ item.0.name }}.vars sign-req server {{ item.1.cn }}"
+    chdir: "{{ easyrsa_installdir }}/easyrsa3"
+    creates: "{{ easyrsa_installdir }}/easyrsa3/{{ item.0.name }}/pki/issued/{{ item.1.cn }}.crt"
+    responses:
+      'Confirm request details': 'yes'
+      'Enter pass phrase': "{{ item.0.cacerts.password }}"
+  with_subelements:
+    - "{{ easyrsa.pki }}"
+    - servercerts
+    - flags:
+      skip_missing: True
+  when: easyrsa.pki is defined and easyrsa.pki | length > 0
+  
+- name: generate request client cert with password
+  expect:
+    command: "./easyrsa --vars=./{{ item.0.name }}.vars gen-req {{ item.1.cn }}"
+    chdir: "{{ easyrsa_installdir }}/easyrsa3"
+    creates: "{{ easyrsa_installdir }}/easyrsa3/{{ item.0.name }}/pki/reqs/{{ item.1.cn }}.req"
+    responses:
+      'Enter PEM pass phrase': "{{ item.1.password }}"
+      'Country Name': "{{ item.1.country_name | default(easyrsa_server_country_name_default) }}"
+      'State or Province Name': "{{ item.1.state | default(easyrsa_server_state_default) }}"
+      'Locality Name': "{{ item.1.city | default(easyrsa_server_city_default) }}"
+      'Organization Name': "{{ item.1.org_name | default(easyrsa_server_org_name_default) }}"
+      'Organizational Unit Name': "{{ item.1.org_unit | default(easyrsa_server_org_unit_default) }}"
+      'Common Name': "{{ item.1.cn }}"
+      'Email Address': "{{ item.1.email | default(easyrsa_server_email_default) }}"
+  with_subelements:
+    - "{{ easyrsa.pki }}"
+    - clientcerts
+    - flags:
+      skip_missing: True
+  when: easyrsa.pki is defined and easyrsa.pki | length > 0 and item.1.password is defined
+
+- name: generate request client cert without password
+  expect:
+    command: "./easyrsa --vars=./{{ item.0.name }}.vars gen-req {{ item.1.cn }} nopass"
+    chdir: "{{ easyrsa_installdir }}/easyrsa3"
+    creates: "{{ easyrsa_installdir }}/easyrsa3/{{ item.0.name }}/pki/reqs/{{ item.1.cn }}.req"
+    responses:
+      'Country Name': "{{ item.1.country_name | default(easyrsa_server_country_name_default) }}"
+      'State or Province Name': "{{ item.1.state | default(easyrsa_server_state_default) }}"
+      'Locality Name': "{{ item.1.city | default(easyrsa_server_city_default) }}"
+      'Organization Name': "{{ item.1.org_name | default(easyrsa_server_org_name_default) }}"
+      'Organizational Unit Name': "{{ item.1.org_unit | default(easyrsa_server_org_unit_default) }}"
+      'Common Name': "{{ item.1.cn }}"
+      'Email Address': "{{ item.1.email | default(easyrsa_server_email_default) }}"
+  with_subelements:
+    - "{{ easyrsa.pki }}"
+    - clientcerts
+    - flags:
+      skip_missing: True
+  when: easyrsa.pki is defined and easyrsa.pki | length > 0 and item.1.password is not defined
+
+- name: sign client cert
+  expect:
+    command: "./easyrsa --vars=./{{ item.0.name }}.vars sign-req client {{ item.1.cn }}"
+    chdir: "{{ easyrsa_installdir }}/easyrsa3"
+    creates: "{{ easyrsa_installdir }}/easyrsa3/{{ item.0.name }}/pki/issued/{{ item.1.cn }}.crt"
+    responses:
+      'Confirm request details': 'yes'
+      'Enter pass phrase': "{{ item.0.cacerts.password }}"
+  with_subelements:
+    - "{{ easyrsa.pki }}"
+    - clientcerts
+    - flags:
+      skip_missing: True
+  when: easyrsa.pki is defined and easyrsa.pki | length > 0
+
+- name: generate crl.pem
+  expect:
+    command: "./easyrsa --vars=./{{ item.name }}.vars gen-crl"
+    chdir: "{{ easyrsa_installdir }}/easyrsa3"
+    creates: "{{ easyrsa_installdir }}/easyrsa3/{{ item.name }}/pki/crl.pem"
+    responses:
+      'Enter pass phrase': "{{ item.cacerts.password }}"
+  with_items:
+    - "{{ easyrsa.pki }}"
+  when: easyrsa.pki is defined and easyrsa.pki | length > 0
+  tags: crlpem

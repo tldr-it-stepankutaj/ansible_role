@@ -1,0 +1,94 @@
+---
+
+### PRO GENEROVANI CERTIFIKATU JE DEFAULTNE POVOLENO ZADAVANI PODROBNYCH INFORMACI O CERTIFIKATU(PARAMETR 'ORG')
+### PRO PRIPAD, KDY BUDE STACIT GENEROVAT CERTIFIKAT POUZE S UDAJEM 'COMMON NAME' JE POTREBA NASTAVIT
+### PROMENOU 'easyrsa.pki.easyrsa_dn' na 'cn'
+
+# easyrsa:
+#   pki:
+#     - name: 'pki1'         				  # NO default
+#       easyrsa_dn: 'cn_only'         # default: 'org'
+#       ca_expire: 1825               # default: 3650
+#       cert_expire: 365              # default: 730
+#
+#       cacerts:
+#         cn: 'Barok CA'              # NO default
+#         email: 'name@domain.tld'    # default: ''
+#         org_name: 'Firma'           # default: 'Firma'
+#         password: 'secret'          # default: ''
+#         country: 'SK'               # default: 'CZ'
+#         state: 'Slovensko'          # default: 'Ceska Rebuplika'
+#         city: 'Prague'              # default: 'Hradec Kralove'
+#         org_unit: 'Obchod'          # default: 'IT'
+#
+#       servercerts:
+#         - cn: domain.tld            # NO default
+#           country: 'SK'             # default: 'CZ'
+#           state: 'Kanada'    		    # default: 'Ceska Republika'
+#           city: 'Toronto'       		# default: 'Hradec Kralove'
+#           org_name: 'Barok'        	# default: 'Firma'
+#           email: 'name@mail.tld'    # default: ''
+#           org_unit: 'Obchod'     		# default: 'IT'
+#
+#       clientcerts:
+#         - cn: username              # NO default
+#           password: 'secret'        # NO default
+#           country: 'SK'             # default: 'CZ'
+#           state: 'Kanada'    		    # default: 'Ceska Republika'
+#           city: 'Toronto'       		# default: 'Hradec Kralove'
+#           org_name: 'Barok'        	# default: 'Firma'
+#           email: 'name@mail.tld'    # default: ''
+#           org_unit: 'Obchod'     		# default: 'IT'
+#         
+#
+### ZAKLAD VETSINOU BUDE STACIT NASLEDUJICI:
+# easyrsa:
+#   pki:
+#     - name: 'pkiname'
+#
+#       cacerts:
+#         password: 'secret'
+#         org_name: 'Firma, s.r.o.' 
+#         cn: 'Firma CA'
+#         email: 'name@domain.tld'
+#
+#       servercerts:
+#         - cn: domain.tld
+#           org_name: 'Firma, s.r.o.'
+#           email: 'name@domain.tld'
+#       
+#       clientcerts:
+#         - cn: username
+#           password: 'secret'
+#           org_name: 'Firma, s.r.o.'
+#           email: 'username@domain.tld'
+
+easyrsa_installdir: '/srv/easy-rsa'
+
+### CACERTS DEFAULT DEFINITION ###
+easyrsa_ca_country_name_default: 'CZ'
+easyrsa_ca_state_default: 'Ceska Republika'
+easyrsa_ca_city_default: 'Hradec Kralove'
+easyrsa_ca_org_name_default: 'Firma'
+easyrsa_ca_email_default: ''
+easyrsa_ca_org_unit_default: 'IT'
+### END ###
+
+### SERVERCERTS DEFAULT DEFINITOIN ###
+easyrsa_server_country_name_default: 'CZ'
+easyrsa_server_state_default: 'Ceska Republika'
+easyrsa_server_city_default: 'Hradec Kralove'
+easyrsa_server_org_name_default: 'Firma'
+easyrsa_server_email_default: ''
+easyrsa_server_org_unit_default: 'IT'
+### END ###
+
+### CLIENTCERTS DEFAULT DEFINITOIN ###
+easyrsa_client_country_name_default: 'CZ'
+easyrsa_client_state_default: 'Ceska Republika'
+easyrsa_client_city_default: 'Hradec Kralove'
+easyrsa_client_org_name_default: 'Firma'
+easyrsa_client_email_default: ''
+easyrsa_client_org_unit_default: 'IT'
+### END ###
+ 

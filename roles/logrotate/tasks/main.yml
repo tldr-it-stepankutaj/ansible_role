@@ -1,0 +1,17 @@
+---
+- name: Include os-specific vars
+  include: 'vars.yml'
+
+- name: Include distribution installation
+  include: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+
+- name: install package
+  package: name=logrotate state=present
+
+- name: Templating out logrotate.d scripts
+  template: src=logrotate.d.j2 dest={{ logrotate_conf_dir }}/{{ item.name }}
+  with_items: "{{ logrotate_scripts }}"
+  when: logrotate_scripts is defined

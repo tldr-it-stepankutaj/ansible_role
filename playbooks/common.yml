@@ -1,0 +1,14 @@
+- hosts: all,!pg
+  become: True
+  become_method: 'sudo'
+  become_user: 'root'
+  vars_files:
+    #- "{{ sudosecret }}"
+
+  roles:
+    - {role: motd, tags: motd}
+    - {role: network, tags: network}
+    - {role: ssh, tags: ssh}
+    - {role: base, tags: base}
+    - {role: sysusers, tags: sysusers}
+    - {role: sudo, tags: sudo}

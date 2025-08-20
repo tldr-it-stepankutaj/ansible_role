@@ -1,0 +1,20 @@
+---
+
+sysusers_groups: {}
+sysusers_users: {}
+
+# how to generate password
+#python -c "from passlib.hash import sha512_crypt; import getpass; print sha512_crypt.encrypt(getpass.getpass())"
+
+# user
+#
+#sysusers_users:
+#  "novak":
+#    name: "novak"
+#    shell: "/sbin/nologin"
+#    home: "/srv/www/novak.cz"
+#    password: "$6$VApcsbTu$vXF4WizfQhJcrFGy0FREAgb5mIhQUkpbFtOJJjLZGC8wcxzQDOCWtbG5drTcXmbW/KeZT40GhlIOJlzSwKehh."
+#    uid: 1003
+#    ssh_keys: []
+#    ssh_private_key: []
+#

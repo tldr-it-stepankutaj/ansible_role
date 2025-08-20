@@ -1,0 +1,6 @@
+{%for nameserver in nameservers | default(['8.8.8.8', '217.31.204.130', '1.1.1.1']) %}
+nameserver {{ nameserver }}
+{% endfor %}
+search {{ network_dns_search | default('.') }}
+options timeout:1 attempts:1
+

@@ -1,0 +1,9 @@
+---
+
+strongswan_distro_deps:
+  - 'libsystemd-dev'
+  - 'libgmp-dev'
+  - 'pkg-config'
+
+strongswan_servicename: strongswan-swanctl
+

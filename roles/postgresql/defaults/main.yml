@@ -1,0 +1,4 @@
+---
+postgres_root_user: root
+postgres_root_pass: GQt5MTyVPuf9vsVWoWDT9YCn
+postgresql_version: 17

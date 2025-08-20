@@ -1,0 +1,35 @@
+---
+
+- name: Include os-specific vars
+  include_tasks: 'vars.yml'
+
+- name: Include distribution installation
+  include_tasks: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution }}.yml"
+        - "{{ ansible_os_family }}.yml"
+      skip: true
+
+- name: Install sudo
+  package: name=sudo state=present
+  when: ansible_os_family != "FreeBSD"
+
+- name: Create sudoers.d directory
+  file:
+    path: "{{ sudo_custom_conf_dir }}"
+    owner: root
+    group: "{{ sudo_system_root_group }}"
+    mode: 0750
+    state: directory
+
+- name: create file sudoers.d
+  template: src=sudoers.d.j2 dest={{ sudo_custom_conf_dir }}/{{ sudodict.key }} validate="{{ sudo_visudo_bin }} -cf %s" owner=root group={{ sudo_system_root_group }} mode=0440
+  with_dict: "{{ sudo_config }}"
+  loop_control:
+    loop_var: sudodict
+
+- name: Setting global sudo conf
+  template: src=sudoers.j2 dest={{ sudo_global_conf }} mode=0440 owner=root group={{ sudo_system_root_group }} validate="{{ sudo_visudo_bin }} -cf %s"
+  when: ansible_os_family != "OpenBSD"
+

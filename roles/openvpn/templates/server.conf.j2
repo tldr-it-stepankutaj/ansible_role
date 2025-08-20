@@ -1,0 +1,66 @@
+{{ ansible_managed }}
+{% set server_config = openvpn_server_conf[item.key] %}
+
+mode server
+tls-server
+local {{ server_config.local | default(inventory_hostname) }}
+port {{ server_config.port | default(1194) }}
+proto {{ server_config.proto | default('tcp') }}
+dev {{ server_config.dev | default('tun') }}
+float
+topology subnet
+
+ca {{ openvpn_conf_dir | default('/etc/openvpn') }}/{{ item.key }}/ca.crt
+cert {{ openvpn_conf_dir | default('/etc/openvpn') }}/{{ item.key }}/{{ item.value.servercert | default(inventory_hostname) }}.crt
+key {{ openvpn_conf_dir | default('/etc/openvpn') }}/{{ item.key }}/{{ item.value.servercert | default(inventory_hostname) }}.key
+dh {{ openvpn_conf_dir | default('/etc/openvpn') }}/{{ item.key }}/dh.pem
+crl-verify {{ openvpn_conf_dir | default('/etc/openvpn') }}/{{ item.key }}/crl.pem
+
+server {{ server_config.server }}
+
+{% if server_config.ifconfig_pool_persist is defined and server_config.ifconfig_pool_persist == True %}
+ifconfig-pool-persist {{ openvpn_conf_dir | default('/etc/openvpn') }}/{{ item.key }}/ipp.txt
+{% endif %}
+client-config-dir {{ openvpn_conf_dir | default('/etc/openvpn') }}/{{ item.key }}/ccd
+
+{% if server_config.dhcp_options is defined and server_config.dhcp_options | length > 0 %}
+{% for dhcp_option in server_config.dhcp_options %}
+push "dhcp-option {{ dhcp_option }}"
+{% endfor %}
+{% endif %}
+push "topology subnet"
+
+{% if server_config.duplicate_cn is defined and server_config.duplicate_cn == True %}
+duplicate-cn
+{% endif %}
+
+keepalive 10 120
+
+tls-auth {{ openvpn_conf_dir | default('/etc/openvpn') }}/{{ item.key }}/ta.key 0
+
+cipher BF-CBC
+comp-lzo
+
+{% if ansible_os_family == 'Debian' %}
+user nobody
+group nogroup
+{% else %}
+user openvpn
+group openvpn
+{% endif %}
+
+persist-key
+persist-tun
+
+status {{ openvpn_conf_dir | default('/etc/openvpn') }}/{{ item.key }}/openvpn-status.log
+log-append  /var/log/openvpn_{{ item.key }}.log
+
+verb 3
+
+management localhost 7505
+{% if server_config.custom_lines is defined and server_config.custom_lines | length > 0 %}
+{% for custom_line in server_config.custom_lines %}
+{{ custom_line }}
+{% endfor %}
+{% endif %}
+

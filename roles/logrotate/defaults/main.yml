@@ -1,0 +1,25 @@
+---
+### DEFINE VARIABLES ###
+#
+# logrotate_scripts:
+#   - name: nginx
+#     path: /var/log/nginx/*.log
+#     options:
+#       - weekly
+#       - size 25M
+#       - rotate 7
+#       - missingok
+#       - compress
+#       - delaycompress
+#       - copytruncate
+#				- sharedscripts
+#     scripts:
+#       postrotate: "[ -s /run/nginx.pid ] && kill -USR1 `cat /run/nginx.pid`"
+# 
+# logrotate_hourly_scripts - je hack pro hodinove rotace na CentOS nizsi verze nez je 7, v sedmicce jiz logrotate hourly ma implementovano
+### END DEFINE VARIABLES ###
+
+logrotate_conf_dir: '/etc/logrotate.d'
+logrotate_scripts: []
+logrotate_hourly_scripts: []
+logrotate_conf_hourly_dir: '/etc/logrotate.hourly.d'

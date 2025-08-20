@@ -1,0 +1,5 @@
+---
+
+ssh_packages: [ openssh-server, openssh-client ]
+ssh_admin_group: root
+

@@ -1,0 +1,11 @@
+{{ ansible_managed }}
+
+[{{ item.key }}]
+{% if item.key is defined %}
+enabled = true
+{% for item in item.value %}
+{{item}}
+{% endfor %}
+{% else %}
+enabled = false
+{% endif %}

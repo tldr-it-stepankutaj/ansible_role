@@ -1,0 +1,31 @@
+{% if motd_override is defined %}
+{{ motd_override }}
+{% else %}
+  HOSTNAME: {{ inventory_hostname }}
+        OS: {{ ansible_distribution }} {% if ansible_distribution_major_version is defined %}{{ ansible_distribution_major_version }} {% endif %}({{ ansible_distribution_version }})
+       CPU: {{ ansible_processor_count }} cpu per {{ ansible_processor_cores }} cores
+    MEMORY: {{ ansible_memtotal_mb }} MB
+   PRODUCT: {{ ansible_product_name }}
+    VENDOR: {{ ansible_system_vendor }}
+{% if ansible_distribution != "OpenBSD" %}
+   DEVICES: 
+{% for dev in ansible_devices.keys() %}
+{% if not ansible_devices[dev]["host"] is match('^USB controller*')  %}
+{% if not dev is match('^loop*') %}
+           {{ dev }}({{ ansible_devices[dev]["size"]}}, {{ ansible_devices[dev]["model"]}})
+{% endif %}
+{% endif %}
+{% endfor %}
+{% endif %}
+INTERFACES: 
+{% for interface in ansible_interfaces if interface not in ['lo','pflog0','pfsync0'] %}
+{% if not interface is match('br-*') and not interface is match('veth*') and not interface is match('one-*') and not interface is match('fw*') and not interface is match('tap*i*') %}
+            {{ interface }}: {% if hostvars[inventory_hostname]['ansible_' + interface|replace('-','_')]['ipv4'] is defined %}{% if hostvars[inventory_hostname]['ansible_' + interface|replace('-','_')]['ipv4'] is not mapping %}{% for ip in hostvars[inventory_hostname]['ansible_' + interface|replace('-','_')]['ipv4'] %}{{ ip.address }} {% endfor %}{% else %}{{ hostvars[inventory_hostname]['ansible_' + interface|replace('-','_')]['ipv4']['address']}}{% endif %}{% endif %}{% if hostvars[inventory_hostname]['ansible_' + interface|replace('-','_')]['ipv4_secondaries'] is defined and hostvars[inventory_hostname]['ansible_' + interface|replace('-','_')]['ipv4'] is not defined %}{% for ip in hostvars[inventory_hostname]['ansible_' + interface|replace('-','_')]['ipv4_secondaries']%}{{ ip.address }} {% endfor %}{% endif %}
+
+{% endif %}
+{% endfor %}
+{% if motd is defined %}
+
+      DESC: {{ motd }}
+{% endif %}
+{% endif %}

@@ -1,0 +1,5 @@
+---
+
+ntpd_config_group: root
+ntpd_config_path: /etc/ntp.conf
+ntpd_service_name: ntp

@@ -1,0 +1,147 @@
+---
+
+- name: Include os-specific vars
+  include: 'vars.yml'
+
+- name: Include distribution installation
+  include: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+    
+- name: Package install
+  package: name=openvpn
+  when: ansible_os_family != "OpenBSD"
+
+- name: Create dir for openvpn instanace
+  file: path={{ openvpn_conf_dir | default('/etc/openvpn') }}/{{ item.key }} mode=0755 owner=root group=root state=directory
+  with_dict: "{{ openvpn_server_conf }}"
+
+- name: Generate file with DH parameters for DHE ciphers
+  command: "openssl dhparam -out {{ openvpn_conf_dir | default('/etc/openvpn') }}/{{ item.key }}/dh.pem 4096"
+  args:
+    creates: "{{ openvpn_conf_dir | default('/etc/openvpn') }}/{{ item.key }}/dh.pem"
+  with_dict: "{{ openvpn_server_conf }}"
+
+- name: Generate ta.key
+  command: "openvpn --genkey --secret ta.key chdir={{ openvpn_conf_dir | default('/etc/openvpn') }}/{{ item.key }}"
+  args:
+    creates: "{{ openvpn_conf_dir | default('/etc/openvpn') }}/{{ item.key }}/ta.key"
+  with_dict: "{{ openvpn_server_conf }}"
+
+- name: Synchronize CA cert from local easy-rsa
+  synchronize:
+    src: "{{ openvpn_easyrsa_pkidir | default('/srv/easy-rsa/easyrsa3') }}/{{ item.key }}/pki/ca.crt"
+    dest: "{{ openvpn_conf_dir | default('/etc/openvpn') }}/{{ item.key }}/ca.crt"
+  delegate_to: "{{ inventory_hostname }}"
+  with_dict: "{{ openvpn_server_conf }}"
+  when: openvpn_easyrsa_server == 'localhost'
+
+#- name: synchronize CA cert from external easy-rsa
+#  synchronize:
+#   mode: pull
+#   src: rsync://{{ easy_rsa_dir }}/
+#   dest: "{{ openvpn_conf_dir | default('/etc/openvpn') }}/{{ item.key }}/ca.crt"
+#  delegate_to: "{{ openvpn_easyrsa_server }}"
+#  with_dict: "{{ openvpn_server_conf }}"
+#  when: openvpn_easyrsa_server != 'localhost'
+
+- name: Synchronize server cert from local easy-rsa
+  synchronize:
+    src: "{{ openvpn_easyrsa_pkidir | default('/srv/easy-rsa/easyrsa3') }}/{{ item.key }}/pki/issued/{{ item.value.servercert | default(inventory_hostname) }}.crt"
+    dest: "{{ openvpn_conf_dir | default('/etc/openvpn') }}/{{ item.key }}/{{ item.value.servercert | default(inventory_hostname) }}.crt"
+  delegate_to: "{{ inventory_hostname }}"
+  with_dict: "{{ openvpn_server_conf }}"
+  when: openvpn_easyrsa_server == 'localhost'
+
+#- name: synchronize server cert from external easy-rsa
+#  synchronize:
+#   mode: pull
+#   src=rsync://{{ easy_rsa_dir }}/
+#   dest: "{{ openvpn_conf_dir | default('/etc/openvpn') }}/{{ item.key }}/{{ inventory_hostname }}.crt"
+#  delegate_to: "{{ openvpn_easyrsa_server }}"
+#  with_dict: "{{ openvpn_server_conf }}"
+#  when: openvpn_easyrsa_server != 'localhost'
+
+- name: Synchronize server key from local easy-rsa
+  synchronize:
+    src: "{{ openvpn_easyrsa_pkidir | default('/srv/easy-rsa/easyrsa3') }}/{{ item.key }}/pki/private/{{ item.value.servercert | default(inventory_hostname) }}.key"
+    dest: "{{ openvpn_conf_dir | default('/etc/openvpn') }}/{{ item.key }}/{{ item.value.servercert | default(inventory_hostname) }}.key"
+  delegate_to: "{{ inventory_hostname }}"
+  with_dict: "{{ openvpn_server_conf }}"
+  when: openvpn_easyrsa_server == 'localhost'
+
+#- name: synchronize server key from external easy-rsa
+#  synchronize:
+#   mode: pull
+#   src=rsync://{{ easy_rsa_dir }}/
+#   dest: "{{ openvpn_conf_dir | default('/etc/openvpn') }}/{{ item.key }}/{{ inventory_hostname }}.key"
+#  delegate_to: "{{ openvpn_easyrsa_server }}"
+#  with_dict: "{{ openvpn_server_conf }}"
+#  when: openvpn_easyrsa_server != 'localhost'
+
+- name: Synchronize server crl.pem from local easy-rsa
+  synchronize:
+    src: "{{ openvpn_easyrsa_pkidir | default('/srv/easy-rsa/easyrsa3') }}/{{ item.key }}/pki/crl.pem"
+    dest: "{{ openvpn_conf_dir | default('/etc/openvpn') }}/{{ item.key }}/crl.pem"
+    perms: no
+  delegate_to: "{{ inventory_hostname }}"
+  with_dict: "{{ openvpn_server_conf }}"
+  when: openvpn_easyrsa_server == 'localhost'
+  notify: 
+    - restart openvpn
+    - set crl permission
+
+#- name: synchronize server crl.pem from external easy-rsa
+#  synchronize:
+#   mode: pull
+#   src=rsync://{{ easy_rsa_dir }}/
+#   dest: "{{ openvpn_conf_dir | default('/etc/openvpn') }}/{{ item.key }}/crl.pem"
+#  delegate_to: "{{ openvpn_easyrsa_server }}"
+#  with_dict: "{{ openvpn_server_conf }}"
+#  when: openvpn_easyrsa_server != 'localhost'
+
+- name: setting server.conf
+  template: src=server.conf.j2 dest=/etc/openvpn/server/{{ item.key }}.conf owner=root group=root mode=0644
+  with_dict: "{{ openvpn_server_conf }}"
+  notify: restart openvpn
+  tags:
+    - openvpn_config
+
+- name: Create ccd dir
+  file: path={{ openvpn_conf_dir | default('/etc/openvpn') }}/{{ item.key }}/ccd owner=root group=root mode=0755 state=directory
+  with_dict: "{{ openvpn_server_conf }}"
+
+#- name: setting allow access
+#  template: src=security/access_openvpn.conf.j2 dest=/etc/security/access_openvpn.conf owner=root group=root mode=0644
+#
+#- name: copying pam file to pam.d
+#  copy: src=pam.d/openvpn dest=/etc/pam.d/openvpn owner=root group=root mode=0644
+
+- include: ccd.yml
+  with_dict: "{{ openvpn_ccd }}"
+  loop_control:
+    loop_var: openvpn_ccd_dict
+  tags:
+    - openvpn_config
+    - openvpn_ccd
+
+- name: Create client config dir
+  file: path={{ openvpn_conf_dir | default('/etc/openvpn') }}/{{ item.key }}/client owner=root group=root mode=0700 state=directory
+  with_dict: "{{ openvpn_server_conf }}"
+  tags:
+    - openvpn_client_config
+      
+- include: client-config.yml
+  with_dict: "{{ openvpn_ccd }}"
+  loop_control:
+    loop_var: openvpn_ccd_dict
+  tags:
+    - openvpn_config
+
+- name: Service start and enabled on boot 
+  service: name=openvpn-server@{{ item.key }} enabled=yes state=started
+  with_dict: "{{ openvpn_server_conf }}"
+  when: easyrsa.pki is defined and easyrsa.pki | length > 0
+
+

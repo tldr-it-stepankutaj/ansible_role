@@ -1,0 +1,29 @@
+---
+
+- name: "Gather client certificate for {{ company }}/{{ client }}"
+  slurp: 
+    src: "/srv/easy-rsa/easyrsa3/{{ company }}/pki/issued/{{client}}.crt"
+  register: openvpn_client_crt
+  tags: openvpn_config
+
+- name: "Gather client key  for {{ company }}/{{ client }}"
+  slurp: 
+    src: "/srv/easy-rsa/easyrsa3/{{ company }}/pki/private/{{client}}.key"
+  register: openvpn_client_key
+  tags: openvpn_config
+
+- name: "Create client config file for {{ company }}/{{ client }}"
+  template: src=client.conf.j2 dest="{{ openvpn_conf_dir | default('/etc/openvpn') }}/{{ company }}/client/{{ client }}.ovpn" owner=root group=root mode=0600
+  vars:
+    crt: "{{ openvpn_client_crt.content | b64decode }}"
+    key: "{{ openvpn_client_key.content | b64decode }}"
+    ca: "{{ openvpn_client_ca.content | b64decode }}"
+    tls: "{{ openvpn_client_tls.content | b64decode }}"
+  tags: openvpn_config
+
+
+- name: "Client vars cleanup for {{ company }}/{{ client }}"
+  set_fact:
+    openvpn_client_crt: none
+    openvpn_client_key: none
+  tags: openvpn_config

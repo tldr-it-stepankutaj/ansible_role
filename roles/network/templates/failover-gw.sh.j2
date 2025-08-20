@@ -1,0 +1,76 @@
+#!/bin/bash
+
+PRIMARYPUB="8.8.8.8"
+PRIMARYGW='{{ network_failover_gw_primarygw }}'
+SECONDARYGW='{{ network_failover_gw_secondarygw }}'
+PRIMARYIP='{{ network_failover_gw_primaryip }}'
+
+EMAILS='{{ network_failover_gw_emails }}'
+
+function is_host_alive() # Returns success or failure as boolean
+{
+	PACKETS=3
+	TRIES=5
+	IP=$1 # saving contents in $1 before is used
+	echo "Pinging $IP"
+	i=0
+	while [ $i -lt $TRIES ]; do
+		REQUEST=$(ping -w 1 -qc $PACKETS -I "$PRIMARYIP" $IP |grep packets| cut -d" " -f1,4)
+		set -- $REQUEST
+		echo -e "Try $i: $1 $2 \t"
+		if [ $1 != $2 ]; then
+			echo "Bad news. $1 sent, $2 received."
+			# exit
+			exitcode=1
+		else
+			echo "Great! $1 sent, $2 received."
+			exitcode=0
+		fi
+		i=$(expr $i + 1)
+	done
+	return $exitcode
+}
+
+CURRENTGW=$(ip route |grep 'weight 100'|awk '{print $3}')
+function changegateway()
+{
+
+	if [ $1 != $CURRENTGW ]; then
+		echo ".  We need to change the default route. After: $1 Before: $2"
+		
+		if [[ ! "$1" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  	  ip route change default scope global nexthop dev "$1" weight 100 nexthop  via "$2" weight 1
+    else
+  	  ip route change default scope global nexthop via "$1" weight 100 nexthop  dev "$2" weight 1	
+		fi
+		#ip route change default scope global nexthop via "$1" weight 100 nexthop  via "$2" weight 1	
+		echo "The routing table has been changed!"
+		ip route # view current routing table
+		echo -e "$4 \n\nHere is the updated routing table:\n$(ip route)" | mail -s "$3 ($(hostname))" $EMAILS
+	else
+		echo ", and we are already pointing to it."
+	fi
+
+}
+
+
+function test()
+{
+	echo $1 $EMAILS
+}
+
+##################
+# main starts here
+##################
+
+if is_host_alive $PRIMARYPUB ; then
+	echo -n "The primary gateway is alive"
+	SUBJECT="$PRIMARYPUB IS NOW UP"; BODY="The server $PRIMARYPUB is now up and was pinged via the gateway of $PRIMARYGW."
+	changegateway $PRIMARYGW $SECONDARYGW "$SUBJECT" "$BODY"
+#	test $PRIMARYGW
+else
+	echo -n "The primary gateway is dead :-( We should be on the backup line"
+	SUBJECT="$PRIMARYPUB IS DOWN"; BODY="The server $PRIMARYPUB could not be pinged via the current gateway of $CURRENTGW."
+        changegateway $SECONDARYGW $PRIMARYGW "$SUBJECT" "$BODY"
+fi
+

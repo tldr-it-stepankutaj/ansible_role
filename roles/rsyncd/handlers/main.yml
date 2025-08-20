@@ -1,0 +1,9 @@
+---
+
+- name: restart xinetd
+  service: name=xinetd state=restarted
+  when: ansible_os_family == 'RedHat' and ansible_distribution_major_version | int <= 6 or ansible_os_family == 'Debian' and ansible_distribution_major_version | int <= 8
+  
+- name: restart rsyncd
+  service: name={{ rsyncd_service }} state=restarted
+  when: ansible_os_family == 'RedHat' and ansible_distribution_major_version | int > 6 or ansible_os_family == 'Debian' and ansible_distribution_major_version | int > 8

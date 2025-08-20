@@ -1,0 +1,7 @@
+# Set the command-line arguments to pass to the server.
+# Due to shell escaping, to pass backslashes for regexes, you need to double
+# them (\\d for \d). If running under systemd, you need to double them again
+# (\\\\d to mean \d), and escape newlines too.
+ARGS="--collector.filesystem.ignored-fs-types=tmpfs --collector.filesystem.ignored-mount-points=^/(sys|proc|dev|run|var/lib/docker|var/lib/kubelet/pods)($|/) --web.listen-address={{ inventory_hostname }}:9100"
+
+

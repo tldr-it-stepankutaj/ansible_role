@@ -1,0 +1,9 @@
+---
+
+strongswan_distro_deps:
+  - 'systemd-devel'
+  - 'gmp-devel'
+  - 'pkgconfig'
+
+strongswan_servicename: strongswan
+

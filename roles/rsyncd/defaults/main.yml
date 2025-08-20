@@ -1,0 +1,35 @@
+---
+
+#
+#
+#
+# EXAMPLE SETUP
+# -------------
+#
+# rsyncd_exclude: /tmp .bashrc
+#
+# rsyncd_secrets_file:
+#   user: 'pass1'
+#   user2: 'pass2'
+#
+# rsyncd_section_config:
+#   - section: name1
+#     options:
+#       - comment = Server Logs
+#       - path = /var/log
+#       - uid = root
+#       - gid = root
+#       - read only = yes
+#       - hosts allow = 10.5.126.13 192.168.1.59
+#       - auth users = user user2:ro
+#       - secrets file = /etc/rsyncd.secrets
+#
+#   - section: name2
+#     options:
+#       - comment = Server Logs
+#       - path = /var/log
+#       - uid = root
+#       - gid = root
+#       - read only = yes
+#       - hosts allow = 10.5.126.13 192.168.1.59
+

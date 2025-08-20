@@ -1,0 +1,14 @@
+---
+
+iptables_var:
+  notify: apply rules
+  service_name: iptables
+  packages:
+    - iptables
+  config_destination: /etc/iptables.rules
+
+ip6tables_var:
+  config_destination: /etc/ip6tables.rules
+  service_name: ip6tables
+
+

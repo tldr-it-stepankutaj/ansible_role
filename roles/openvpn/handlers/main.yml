@@ -1,0 +1,13 @@
+---
+
+- name: restart openvpn
+  service: name=openvpn-server@{{ item.key }} state=restarted
+  with_dict: "{{ openvpn_server_conf }}"
+
+- name: set crl permission
+  file:
+    path: "{{ openvpn_conf_dir | default('/etc/openvpn') }}/{{ item.key }}/crl.pem"
+    mode: 0644
+  with_dict: "{{ openvpn_server_conf }}"
+
+

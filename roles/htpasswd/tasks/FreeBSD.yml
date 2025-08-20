@@ -1,0 +1,9 @@
+---
+
+- name: 'Install htpasswd package for FreeBSD OS'
+  pkgng:
+    name:
+      - apache24
+      - py27-passlib
+    state: present
+

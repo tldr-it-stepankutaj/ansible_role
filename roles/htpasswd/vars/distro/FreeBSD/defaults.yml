@@ -1,0 +1,5 @@
+---
+
+htpasswd_system_root_group: 'wheel'
+htpasswd_path_dir: '/usr/local/etc/nginx/passwords'
+

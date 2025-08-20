@@ -1,0 +1,5 @@
+---
+easyrsa_dist_dependencies:
+  - git
+  - python3-pip 
+

@@ -1,0 +1,24 @@
+---
+
+nftables:
+  tcp_ports: []
+  udp_ports: []
+  custom_input_rules: []
+  custom_forward_rules: []
+  custom_output_rules: []
+  custom_prerouting_rules: []
+  custom_postrouting_rules: []
+  ssh_port: 22
+  permit_public_ssh: True
+  #enable_nat: False # OPTIONAL, default is not use nat
+  #trusted_hosts: [1.2.3.4] # REQUIED
+
+
+# nftables:
+#   tcp_ports: [ 80, 443 ]
+# seznam TCP portu k povoleni na vstupu
+#
+#   udp_ports: [ 80, 443 ]
+# seznam UDP portu k povoleni na vstupu
+#
+

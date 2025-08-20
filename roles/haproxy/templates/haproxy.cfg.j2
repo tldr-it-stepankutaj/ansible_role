@@ -1,0 +1,54 @@
+global
+  log /dev/log  local0
+  log /dev/log  local1 notice
+{% if haproxy_socket != '' %}
+  stats socket {{ haproxy_socket }}
+{% endif %}
+{% if haproxy_chroot != '' %}
+  chroot {{ haproxy_chroot }}
+{% endif %}
+  user {{ haproxy_user }}
+  group {{ haproxy_group }}
+  daemon
+{% for global_var in haproxy_global_vars %}
+  {{ global_var }}
+{% endfor %}
+
+frontend stats 
+  bind {{ haproxy_stats_ip }}:1936
+  mode            http
+  stats enable
+  stats refresh 10s
+  stats show-node
+  stats uri  /stats
+
+defaults
+  log global
+  option  httplog
+  option  dontlognull
+{% if haproxy_version is version('1.4', '<=') %}
+    contimeout {{ haproxy_connect_timeout }}
+    clitimeout {{ haproxy_client_timeout }}
+    srvtimeout {{ haproxy_server_timeout }}
+{% else %}
+    timeout connect {{ haproxy_connect_timeout }}
+    timeout client {{ haproxy_client_timeout }}
+    timeout server {{ haproxy_server_timeout }}
+{% endif %}
+
+frontend {{ haproxy_frontend_name }}
+  bind {{ haproxy_frontend_bind_address }}:{{ haproxy_frontend_port }}
+  mode {{ haproxy_frontend_mode }}
+  option {{ haproxy_frontend_option }}
+  default_backend {{ haproxy_backend_name }}
+
+backend {{ haproxy_backend_name }}
+  mode {{ haproxy_backend_mode }}
+  balance {{ haproxy_backend_balance_method }}
+{% for option in haproxy_backend_option %}
+  option {{ option }}
+{% endfor %}
+  default-server inter 10s downinter 5s rise 2 fall 2 slowstart 60s maxconn 250 maxqueue 256 weight 100
+{% for backend in haproxy_backend_servers %}
+  server {{ backend.name }} {{ backend.address }} check
+{% endfor %}

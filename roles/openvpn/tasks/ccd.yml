@@ -1,0 +1,6 @@
+---
+
+- name: Create ccd file
+  template: src=ccd.conf.j2 dest={{ openvpn_conf_dir | default('/etc/openvpn') }}/{{ openvpn_ccd_dict.key }}/ccd/{{ item.key }} owner=root group=root mode=0644
+  with_dict: "{{ openvpn_ccd_dict.value}}" 
+  tags: openvpn_config

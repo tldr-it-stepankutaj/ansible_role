@@ -1,0 +1,50 @@
+---
+
+- name: Include os-specific vars
+  include_tasks: 'vars.yml'
+
+- name: Include distribution installation
+  include: "{{ item }}"
+  with_first_found:
+  - files:
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+    skip: true
+
+- name: 'Install global dependency packages'
+  package:
+    name:
+      - 'autoconf'
+      - 'libtool'
+      - 'bison'
+      - 'gettext'
+      - 'flex'
+      - 'gperf'
+      - 'bison'
+    state: 'present'
+
+- name: 'Install distribution dependency packages'
+  package:
+    name: "{{ strongswan_distro_deps }}"
+
+- name: 'Clone repo strongswan'
+  git:
+    clone: yes
+    update: yes
+    repo: git://git.strongswan.org/strongswan.git
+    dest: "{{ strongswan_checkout_dir | default('/usr/local/src/strongswan') }}"
+    version: "{{ strongswan_version }}"
+    depth: 1
+
+- name: 'Install strongswan'
+  shell: |
+    ./autogen.sh && \
+    ./configure --prefix=/usr --sysconfdir=/etc --enable-systemd --disable-charon --disable-stroke --disable-scepclient --enable-eap-mschapv2 --enable-md4 && \
+    make && make install
+  args:
+    chdir: "{{ strongswan_checkout_dir | default('/usr/local/src/strongswan') }}"
+    creates: "{{ strongswan_checkout_dir | default('/usr/local/src/strongswan') }}/configure"
+
+- name: 'Service enabled and start'
+  service: name="{{ strongswan_servicename}}" enabled=yes state=started
+

@@ -1,0 +1,86 @@
+# {{ ansible_managed }}
+{% if iptables.enable_nat is defined and iptables.enable_nat == True %}
+*nat
+{% if iptables.custom_nat_rules is defined %}
+{% for rule in iptables.custom_nat_rules %}
+{{ rule }}
+{% endfor %}
+{% endif %}
+COMMIT
+{% endif %}
+
+*mangle
+{% if iptables.custom_mangle_rules is defined %}
+{% for rule in iptables.custom_mangle_rules %}
+{{ rule }}
+{% endfor %}
+{% endif %}
+COMMIT
+
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+
+# allow ping and traceroute
+-A INPUT -p icmp -j ACCEPT
+
+# localhost is fine
+-A INPUT -i lo -j ACCEPT
+
+# banned ip/net list
+{% if iptables.banned is defined %}
+{% for host in iptables.banned %}
+-A INPUT -p all -s {{ host }} -j DROP
+{% endfor %}
+{% endif %}
+
+# Established connections allowed
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A OUTPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+{% if iptables.permit_public_ssh == True %}
+# allow ssh - always
+-A INPUT -m conntrack --ctstate NEW -m tcp -p tcp --dport {{ iptables.ssh_port }} -j ACCEPT
+{% endif %}
+
+# allow from trusted hosts
+{% for host in iptables.trusted_hosts %}
+-A INPUT -s {{ host }} -j ACCEPT
+{% endfor %}
+
+{% if iptables.zabbix_server_ip is defined %}
+# allow zabbix server
+-A INPUT -m conntrack --ctstate NEW -m tcp -p tcp -s {{ iptables.zabbix_server_ip }} --dport 10050 -j ACCEPT
+{% endif %}
+
+
+# if the host/group defines incoming tcp_ports - allow them
+{% if iptables.tcp_ports is defined %}
+{% for port in iptables.tcp_ports %}
+-A INPUT -p tcp -m tcp --dport {{ port }} -j ACCEPT
+{% endfor %}
+{% endif %}
+
+# if the host/group defines incoming udp_ports - allow them
+{% if iptables.udp_ports is defined %}
+{% for port in iptables.udp_ports %}
+-A INPUT -p udp -m udp --dport {{ port }} -j ACCEPT
+{% endfor %}
+{% endif %}
+
+# if there are custom rules - put them in as-is
+{% if iptables.custom_rules is defined %}
+{% for rule in iptables.custom_rules %}
+{{ rule }}
+{% endfor %}
+{% endif %}
+
+# otherwise kick everything out
+#-A INPUT -j LOG --log-prefix "iptables: INPUT blocked "
+-A INPUT -j REJECT --reject-with icmp-host-prohibited
+#-A FORWARD -j LOG --log-prefix "iptables: FORWARD blocked "
+-A FORWARD -j REJECT --reject-with icmp-host-prohibited
+COMMIT
+

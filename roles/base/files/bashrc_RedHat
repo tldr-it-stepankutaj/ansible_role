@@ -1,0 +1,69 @@
+### GLOBAL VARIABLES ###
+[ -f /etc/bashrc ] && . /etc/bashrc;
+### END ###
+
+export PAGER="less -isM"        # defaultni strankovac
+export LESS="-isMR --shift 5"   # defaultni strankovac, parametry pro man
+export EDITOR="vim"             # defaultni textovy editor
+
+[ -z "$PS1" ] && return         # pokud neni interaktivni rezim, nic nedelat
+
+### NASTAVENI TERMINALU PRO 256 ODSTINU BAREV ###
+case "$TERM" in
+  xterm*) TERM=xterm-256color
+esac 
+### END ###
+
+#[ $TERM != "xterm-256color" ] && exec screen -q ### defaultni terminal screen
+
+##### SETTING BASH PROMPT #####
+export PS1="\[\033[1;34m\]\t \[\033[0;36m\]\u@\H \[\033[0;32m\]\w \[\033[1;31m\]\${?##0}\[\033[1;34m\]\\\$\[\033[0m\] ";
+export PS2="\[\033[1;34m\]>\[\033[0m\] ";
+export PS4='\[\033[1;34m\]+${BASH_SOURCE}:${LINENO}${FUNCNAME[0]:+ [${FUNCNAME[0]}()]}: \[\033[0m\]';
+
+# don't put duplicate lines in the history. See bash(1) for more options
+# ... or force ignoredups and ignorespace
+HISTCONTROL=ignoredups:ignorespace
+
+# append to the history file, don't overwrite it
+shopt -s histappend
+
+# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+HISTSIZE=1000000
+HISTFILESIZE=10000000
+HISTTIMEFORMAT="[$(tput setaf 6)%F %T$(tput sgr0)]: " # colorful date
+
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+
+### User specific aliases and functions ###
+
+alias ll='ls -al --color=auto'
+alias l='ls -l --color=auto'
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+alias h='history'
+alias ducks='du -cks *|sort -rn|head -11'
+alias pocasi='curl wttr.in/Hradec_Kralove'
+alias gita='git add . && git commit -a -m "autocommit"'
+alias g='grep'
+alias zu='/etc/zabbix/scripts/yum-updates.sh 1'
+
+### ZMENY CESTY ###
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+alias .....="cd ../../../.."
+alias ......="cd ../../../../.."
+alias .......="cd ../../../../../.."
+### END ###
+
+### GENEROVANI HESEL ###
+pwg() { env LC_CTYPE=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c${1:-32}; echo; }
+pwgredis() { env LC_CTYPE=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c${1:-45}; echo; }
+pwg1()  { env LC_CTYPE=C tr -dc \''_A-Za-z0-9`~!@#"$%^*=+\[]{}.,:?/-' < /dev/urandom | head -c${1:-32}; echo; }
+pwg2() { env LC_CTYPE=C tr -dc \''_A-Za-z0-9><`~!@#&"()$%^*=+\|[]{};.,:?/-' < /dev/urandom | head -c${1:-32}; echo; }
+### END ###
+

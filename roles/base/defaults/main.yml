@@ -1,0 +1,39 @@
+---
+
+# Description
+# =========== 
+# role are set default enviroment for all servers in the repo.
+# 
+# Is set this:
+#
+#   - set hostname for server
+#   - set ntp sync time
+#   - install base packages
+#   - remove unused packages - Only Redhat Linux distribution
+#   - set .bashrc for linux distribution
+#   - set .profile for OpenBSD distribution
+#   - check or install ssh key for backup server
+#   - set pkg mirror for OpenBSD distribution
+#   - copy base admin scripts to ``/srv/bin/``
+#   - set Epel and wtnetrepo for yum - Only Redhat Linux distribution
+#
+# Dependencies
+# ============
+# 
+#  - role 'ntp'
+#  - role 'wtnetrepo'
+#
+# VARIABLES
+# =========
+#
+# EXAMPLE SETUP
+# =============
+#
+# TODOS
+# =====
+#
+#
+
+epel_repo_url: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
+epel_repo_gpg_key_url: "/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}"
+

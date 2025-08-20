@@ -1,0 +1,30 @@
+---
+
+- name: Include os-specific vars
+  include: 'vars.yml'
+
+- name: Include distribution installation
+  include: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+
+
+      #- name: Create dir for openvpn instanace
+      #  file: path={{ openvpn_conf_dir | default('/etc/openvpn') }}/{{ item.key }} mode=0755 owner=root group=root state=directory
+      #  with_dict: "{{ openvpn_server_conf }}"
+      #
+
+  #- name: setting server.conf
+  #  template: src=server.conf.j2 dest=/etc/openvpn/server/{{ item.key }}.conf owner=root group=root mode=0644
+  #  with_dict: "{{ openvpn_server_conf }}"
+  #  notify: restart openvpn
+  #  tags:
+  #    - openvpn_config
+
+      #- name: Service start and enabled on boot 
+      #  service: name=openvpn-server@{{ item.key }} enabled=yes state=started
+      #  with_dict: "{{ openvpn_server_conf }}"
+      #  when: easyrsa.pki is defined and easyrsa.pki | length > 0
+
+

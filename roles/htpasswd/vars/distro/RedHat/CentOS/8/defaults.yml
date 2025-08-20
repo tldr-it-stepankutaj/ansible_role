@@ -1,0 +1,6 @@
+---
+htpasswd_packages:
+  - python3-passlib
+  - python3-pip
+  - "{{ htpasswd_httpd_utils }}"
+

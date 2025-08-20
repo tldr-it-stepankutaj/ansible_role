@@ -1,0 +1,7 @@
+# handlers file
+---
+- name: restart percona-server
+  service:
+    name: mysql
+    state: restarted
+  when: service_default_state | default('started') == 'started'

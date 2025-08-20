@@ -1,0 +1,14 @@
+# tasks file
+---
+- name: Stop and disable apparmor
+  service:
+    name: apparmor
+    state: stopped
+    enabled: no
+
+- name: Unlock hard nofile limits for wildcard domain
+  pam_limits:
+    domain: '*'
+    limit_type: hard
+    limit_item: nofile
+    value: unlimited

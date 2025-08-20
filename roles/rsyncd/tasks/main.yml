@@ -1,0 +1,42 @@
+---
+
+- name: Include os-specific vars
+  include: 'vars.yml'
+
+- name: Include distribution installation
+  include: "{{ item }}"
+  with_first_found:
+  - files:
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+    skip: true
+
+- name: Install dependencies for old distributions
+  package: name=xinetd state=present
+  when: ansible_os_family == 'RedHat' and ansible_distribution_major_version | int <= 6 or ansible_os_family == 'Debian' and ansible_distribution_major_version | int <= 8
+
+- name: install packages
+  package: state=present name={{item}}
+  with_items:
+  - rsync
+#  - libsemanage-python
+
+- name: rsyncd.conf file
+  template: src=rsyncd.conf.j2 dest=/etc/rsyncd.conf 
+  notify:
+  - restart rsyncd
+  - restart xinetd
+
+- name:
+  template: src=rsyncd.secrets.j2 dest=/etc/rsyncd.secrets owner=root group=root mode=0400
+  when: rsyncd_secrets_file is defined
+
+- name: xinetd rsync file
+  copy: src=rsync.xinetd dest=/etc/xinetd.d/rsync mode=0644
+  notify:
+    - restart xinetd
+  when: ansible_os_family == 'RedHat' and ansible_distribution_major_version | int <= 6 or ansible_os_family == 'Debian' and ansible_distribution_major_version | int <= 8
+
+- name: Enabled and started rsyncd.service
+  service: name={{ rsyncd_service }} state=started enabled=yes
+  when: ansible_os_family == 'RedHat' and ansible_distribution_major_version | int > 6 or ansible_os_family == 'Debian' and ansible_distribution_major_version | int > 8

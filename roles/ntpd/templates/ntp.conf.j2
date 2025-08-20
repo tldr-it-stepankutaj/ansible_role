@@ -1,0 +1,20 @@
+{{ ansible_managed }}
+
+driftfile {{ ntpd_driftfile }}
+tos minclock 3 maxclock 6
+restrict default limited kod nomodify notrap nopeer noquery
+restrict -6 default limited kod nomodify notrap nopeer noquery
+restrict source  limited kod nomodify notrap noquery
+restrict 127.0.0.1
+restrict ::1
+{% if ntpd_server is defined and ntpd_server != "" %}
+server {{ ntpd_server }} iburst
+{% else %}
+server tik.cesnet.cz iburst
+server tak.cesnet.cz iburst
+{% endif %}
+leapfile "{{ ntpd_leapfile }}"
+{% if ansible_os_family != 'FreeBSD' %}
+includefile /etc/ntp/crypto/pw
+keys {{ ntpd_keys }}
+{% endif %}

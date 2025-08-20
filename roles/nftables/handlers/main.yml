@@ -1,0 +1,8 @@
+---
+
+- name: 'reload nftables'
+  service:
+    name: 'nftables'
+    state: 'reloaded'
+  tags:
+    - 'nftables_config'

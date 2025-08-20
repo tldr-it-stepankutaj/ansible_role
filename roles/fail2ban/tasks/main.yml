@@ -1,0 +1,26 @@
+---
+
+- name: Set distribution variables
+  include_vars: "{{item}}"
+  with_first_found: 
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_distribution }}.yml"
+
+- name: pkgs to install
+  action: package state=installed name={{item}}
+  with_items: "{{fail2ban_packages}}"
+
+- name: activate jails global defaults
+  template: src="jail.d/00-defaults.conf.j2" dest="/etc/fail2ban/jail.d/00-defaults.conf" owner=root group=root mode=0644
+  notify:
+    - reload fail2ban
+
+- name: activate jails
+  template: src="jail.d/jail.conf.j2" dest="/etc/fail2ban/jail.d/{{item.key}}.conf" owner=root group=root mode=0644
+  with_dict: "{{ fail2ban_jails }}"
+  notify:
+    - reload fail2ban
+
+- name: enable service
+  service: name=fail2ban enabled=yes state=started
+

@@ -1,0 +1,28 @@
+{{ ansible_managed }}
+
+[DEFAULT]
+# "ignoreip" can be an IP address, a CIDR mask or a DNS host. Fail2ban will not
+# ban a host which matches an address in this list. Several addresses can be
+# defined using space separator.
+
+ignoreip = {{ fail2ban_ignoreip }}
+
+# "bantime" is the number of seconds that a host is banned.
+bantime  = {{ fail2ban_bantime }}
+
+#
+# ACTIONS
+#
+
+# Some options used for actions
+
+# Destination email address used solely for the interpolations in
+# jail.{conf,local,d/*} configuration files.
+destemail = {{ fail2ban_destemail }}
+
+# Sender email address used solely for some actions
+sender = {{ fail2ban_sender }}
+
+banaction = iptables-multiport
+
+

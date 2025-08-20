@@ -1,0 +1,79 @@
+---
+
+# DESCRIPTION
+# ===========
+#
+# Install and configuration OpenVPN server - multiple instances
+#
+# DEPENDENCIES
+# ============
+#  role:
+#    - 'easyrsa'
+# 
+# VARIABLES
+# =========
+#
+# openvpn_easyrsa_server: 'localhost'                 # Required; No Default; Options = 'localhost|external.server.tld'
+# openvpn_conf_dir: '/etc/openvpn/                    # Optional; Default = '/etc/openvpn'
+# openvpn_easyrsa_pkidir: '/srv/easy-rsa/easyrsa3'    # Optional; Default = '/srv/easy-rsa/easyrsa3'
+#
+# openvpn_server_conf:                                # Required; Configuration file for OpenVPN server
+#  name:                                              # Required; Name instance OpenVPN
+#    server: '1.2.3.0 255.255.255.0'                  # Required; No Default; Set IP Net for clients and IP for server
+#    local: '1.2.3.4'                                 # Optional; Default = inventory_hostname
+#    remote: 'vpn.domain.tld'                         # Required: Default = none; DNS name of VPN server for clients
+#    port: '1194'                                     # Optional; Default = 1194
+#    proto: 'udp'                                     # Optional; Default = tcp
+#    dev: 'tun1'                                      # Optional; Default = tun
+#    ifconfig_pool_persist: False                     # Optional; Default = False; Value is True or False
+#    dhcp_options:                                    # Optional; No Default; Set value for DHCP(DNS,DNS-Serch ...)
+#      - 'DNS 8.8.8.8'
+#      - 'DNS 8.8.4.4'
+#      - 'DOMAIN domain.tld'
+#    duplicate_cn: True                               # Optional; Default = False; Value is True or False
+#    servercerts: 'vpn.domain.tld'                    # Optional; Default = {{ inventory_hostname }}, set name for server cert 
+#    custom_lines: []                                 # Optional; Custom config lines support
+#
+#
+# openvpn_ccd: {}                                     # Optional; No Default; Set custom user settings
+#
+# EXAMPLE SETUP
+# =============
+# 
+# openvpn_easyrsa_server: localhost
+#
+# openvpn_server_conf:
+#   name_1:
+#     local: '1.2.3.4'
+#     port: '1194'
+#     remote: vpn.domain.tld
+#     server: '1.2.3.0 255.255.255.0'
+#     dhcp_options:
+#       - 'DNS 8.8.8.8'
+#       - 'DNS 8.8.4.4'
+#       - 'DOMAIN domain.tld'
+#   
+#   name_2:
+#     local: '1.2.4.4'
+#     port: '1195'
+#     server: '1.2.4.0 255.255.255.0'
+#     dhcp_options:
+#       - 'DNS 8.8.8.8'
+#       - 'DNS 8.8.4.4'
+#       - 'DOMAIN domain1.tld'
+#
+# openvpn_ccd:
+#   name_1:
+#     user1:
+#       - 'ifconfig-push 10.1.2.1 255.255.255.0'
+#     user2:
+#       - 'ifconfig-push 10.1.2.2 255.255.255.0'
+#   name_2:
+#     user1:
+#       - 'ifconfig-push 10.1.2.1 255.255.255.0'
+#     user2:
+#       - 'ifconfig-push 10.1.2.2 255.255.255.0'
+#
+
+openvpn_easyrsa_server: localhost
+

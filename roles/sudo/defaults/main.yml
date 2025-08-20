@@ -1,0 +1,24 @@
+---
+
+# VARIABLES
+# =========
+#
+# sudoers_requiretty: False                       # Optional; Default = True; set require TTY or no require TTY
+# sudo_group_sudo_nopasswd: True                  # Optional; Default = False; set use or notuse password for group sudo
+# sudo_secure_path: '/usr/local/sbin'             # Optional; Default = '/usr/local/bin:/usr/local/sbin:/sbin:/bin:/usr/sbin:/usr/bin'; set PATH for sudo user
+#
+# EXAMPLES
+# ========
+#
+# sudo_config:
+#   vholicka:
+#     - "Cmnd_Alias CONTROLREDMINE = /usr/sbin/service redmine start, /usr/sbin/service redmine stop"
+#     - "vholicka ALL = NOPASSWD: CONTROLREDMINE"
+
+# NOTE: Variables example for OpenBSD
+# pouzivaji se sablony z VARS pro modul lineinfile
+# sudo:
+#   - zabbix
+
+sudo_config: {}
+

@@ -1,0 +1,16 @@
+---
+
+iptables_var:
+  notify: reload iptables
+  service_name: iptables
+  packages:
+    - iptables-services
+  packages_pre7:
+    - iptables
+    - iptables-ipv6
+  config_destination: /etc/sysconfig/iptables
+
+ip6tables_var:
+  config_destination: /etc/sysconfig/ip6tables
+  service_name: ip6tables
+

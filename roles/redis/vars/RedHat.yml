@@ -1,0 +1,5 @@
+---
+redis_package: redis
+redis_service: redis
+redis_conf_dir: '/etc'
+

@@ -1,0 +1,20 @@
+---
+
+
+
+- name: Update prometheus-postgres-exporter config
+  template:
+    src: prometheus-postgres-exporter.j2
+    dest: "/etc/default/prometheus-postgres-exporter"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart prometheus-postgres-exporter
+
+
+- name: Install prometheus-postgres-exporter.
+  package:
+    name: "prometheus-postgres-exporter"
+    state: "present"
+
+

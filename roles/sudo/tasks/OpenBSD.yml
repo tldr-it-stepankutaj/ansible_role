@@ -1,0 +1,11 @@
+---
+
+- name: Install sudo
+  package: name=sudo-- state=present
+  when: ansible_distribution_version | int > 5
+
+- name: set OpenBSD sudoers
+  lineinfile: dest=/etc/sudoers regexp="{{sudo_template[item].regexp}}" line="{{sudo_template[item].line}}" validate="{{ sudo_visudo_bin }} -cf %s"
+  with_items: "{{openbsd_sudo}}"
+
+

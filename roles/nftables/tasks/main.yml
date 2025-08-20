@@ -1,0 +1,39 @@
+---
+
+- name: 'Include os-specific vars'
+  include_tasks: 'vars.yml'
+  tags:
+    - nftables_config
+
+- name: 'Include distribution installation'
+  include: "{{ item }}"
+  with_first_found:
+  - files:
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+    skip: true
+  tags:
+    - nftables_config
+
+- name: 'Generate nftables inet filter'
+  template:
+    src: 'nftables'
+    dest: '/etc/sysconfig/nftables.conf'
+    mode: '0600'
+    validate: '/sbin/nft -c -f %s'
+  notify:
+    - 'reload nftables'
+  tags:
+    - 'nftables_config'
+
+- name: 'Enable IP forwarding'
+  sysctl: name=net.ipv4.ip_forward value=1 sysctl_set=yes state=present reload=yes
+  when: nftables.enable_nat is defined and nftables.enable_nat == True
+  tags: nftables_config
+
+- name: 'Service nftables enabled on boot and started'
+  service:
+    name: 'nftables'
+    state: 'started'
+    enabled: 'yes'
+

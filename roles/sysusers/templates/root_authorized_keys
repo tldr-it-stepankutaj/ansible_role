@@ -1,0 +1,14 @@
+## USER KEYS
+{% for user_key in company_root_ssh_keys %}
+{{ user_key }}
+{% endfor %}
+## USER KEYS
+
+{% if server_root_ssh_keys is defined %}
+## SERVER KEYS
+{% for server_key in server_root_ssh_keys %}
+{{ server_key }}
+{% endfor %}
+## SERVER KEYS
+{% endif %}
+

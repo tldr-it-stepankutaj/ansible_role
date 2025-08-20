@@ -1,0 +1,31 @@
+---
+- name: Include os-specific vars
+  include_tasks: 'vars.yml'
+  tags:
+    - ssh_config
+
+- name: Include distribution installation
+  include_tasks: "{{ item }}"
+  with_first_found:
+  - files:
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+    skip: true
+
+- name: 'Make SSHD config'
+  template:
+    src: 'sshd_config.j2'
+    dest: '/etc/ssh/sshd_config'
+    owner: 'root'
+    group: "{{ ssh_admin_group }}"
+    mode: 0600
+    validate: '/usr/sbin/sshd -t -f %s'
+  notify:
+  - restart sshd
+  tags:
+    - ssh_config
+
+- name: allow permission to sftp dir
+  file: path={{ item.value.ChrootDirectory }} mode={{ item.value.ChrootDirectoryMode | default(0750) }} owner=root group={{ item.value.ChrootDirectoryGroup | default(item.key) }} state=directory
+  with_dict: "{{ ssh_internal_sftp_users }}"
+

@@ -1,0 +1,32 @@
+---
+iptables:
+  tcp_ports: []
+  udp_ports: []
+  custom_rules: []
+  custom_nat_rules: []
+  ssh_port: 22
+  permit_public_ssh: True
+  #enable_nat: False # OPTIONAL, default is not use nat
+  #trusted_hosts: [1.2.3.4] # REQUIED
+
+ip6tables:
+  custom_rules: []
+  custom_nat_rules: []
+
+
+
+# iptables:
+#   tcp_ports: [ 80, 443 ]
+#   banned:
+#     - 192.168.1.1
+# seznam TCP portu k povoleni na vstupu
+#
+#   udp_ports: [ 80, 443 ]
+# seznam UDP portu k povoleni na vstupu
+#
+#   custom_rules: [
+#     '-A INPUT -p tcp -m tcp -s 10.5.126.13 --dport 873 -j ACCEPT',
+#     '-A INPUT -p tcp -m tcp -s 192.168.1.59 --dport 873 -j ACCEPT',
+#    ]
+#   zabbix_server_ip: "1.2.3.4"
+

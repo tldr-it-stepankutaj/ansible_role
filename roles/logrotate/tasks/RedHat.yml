@@ -1,0 +1,18 @@
+---
+
+- name: create logrotate hourly global conf
+  copy: src=logrotate_hourly.conf dest=/etc/logrotate_hourly.conf owner=root group=root mode=0644
+  when: logrotate_hourly_scripts is defined and ansible_distribution == 'CentOS' and ansible_distribution_major_version == '6'
+
+- name: Cron for hourly logrotate
+  copy: src=cron_hourly dest=/etc/cron.hourly/logrotate owner=root group=root mode=0700
+  when: logrotate_hourly_scripts is defined and ansible_distribution == 'CentOS' and ansible_distribution_major_version == '6'
+
+- name: Create dir for logrotate hourly custom scripts
+  file: path={{ logrotate_conf_hourly_dir }} state=directory owner=root group=root mode=0755
+  when: logrotate_hourly_scripts is defined and ansible_distribution == 'CentOS' and ansible_distribution_major_version == '6'
+
+- name: Templating out logrotate.hourly.d scripts
+  template: src=logrotate.d.j2 dest={{ logrotate_conf_hourly_dir }}/{{ item.name }}
+  with_items: "{{ logrotate_hourly_scripts }}"
+  when: logrotate_hourly_scripts is defined and ansible_distribution == 'CentOS' and ansible_distribution_major_version == '6'

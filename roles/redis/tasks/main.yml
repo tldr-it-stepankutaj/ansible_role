@@ -1,0 +1,19 @@
+---
+- name: include os-specific vars
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Install Debian Redis repo
+  apt_repository: repo='ppa:chris-lea/redis-server'
+  when: ansible_os_family == 'Debian'
+
+- name: install package
+  package: name={{ redis_package }}
+
+- name: setting config file
+  template: src=redis.conf.{{ ansible_os_family }}.j2 dest={{ redis_conf_dir }}/redis.conf mode=0644 owner=root group=root
+  notify:
+    - restart redis
+
+- name: enable service
+  service: name={{ redis_service }} state=started enabled=yes
+

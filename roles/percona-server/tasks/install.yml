@@ -1,0 +1,26 @@
+# tasks file
+---
+- name: install | configure debconf
+  debconf:
+    name: "{{ item.name }}"
+    question: "{{ item.question }}"
+    value: "{{ item.value }}"
+    vtype: "{{ item.vtype }}"
+  with_items: "{{ percona_server_debconf_selections }}"
+  changed_when: false
+  tags:
+    - percona-server-install-configure-debconf
+
+- name: install | dependencies
+  apt:
+    name: "{{ percona_server_dependencies }}"
+    state: "{{ apt_install_state | default('latest') }}"
+  tags:
+    - percona-server-install-dependencies
+
+- name: install | additional
+  apt:
+    name: "{{ percona_server_install }}"
+    state: "{{ apt_install_state | default('latest') }}"
+  tags:
+    - percona-server-install-additional
