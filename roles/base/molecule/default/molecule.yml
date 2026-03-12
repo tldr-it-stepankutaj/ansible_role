@@ -1,0 +1,20 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: debian-base
+    image: debian:bookworm
+    pre_build_image: true
+    command: /bin/systemd
+    privileged: true
+  - name: centos-base
+    image: rockylinux:9
+    pre_build_image: true
+    command: /usr/sbin/init
+    privileged: true
+provisioner:
+  name: ansible
+verifier:
+  name: ansible

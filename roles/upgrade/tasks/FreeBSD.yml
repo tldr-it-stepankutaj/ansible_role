@@ -1,0 +1,29 @@
+---
+
+- name: Update package repository
+  command: pkg update -f
+  changed_when: false
+  tags:
+    - upgrade
+
+- name: Upgrade all packages
+  command: pkg upgrade -y
+  register: pkg_upgrade
+  changed_when: "'Nothing to do' not in pkg_upgrade.stdout"
+  tags:
+    - upgrade
+
+- name: Clean package cache
+  command: pkg clean -ay
+  when: upgrade_clean_cache | bool
+  changed_when: false
+  tags:
+    - upgrade
+
+- name: Remove unused packages
+  command: pkg autoremove -y
+  when: upgrade_autoremove | bool
+  register: pkg_autoremove
+  changed_when: "'Nothing to do' not in pkg_autoremove.stdout"
+  tags:
+    - upgrade

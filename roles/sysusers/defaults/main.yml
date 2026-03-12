@@ -3,10 +3,10 @@
 sysusers_groups: {}
 sysusers_users: {}
 
-# how to generate password
-#python -c "from passlib.hash import sha512_crypt; import getpass; print sha512_crypt.encrypt(getpass.getpass())"
+# How to generate a password hash:
+# python -c "from passlib.hash import sha512_crypt; import getpass; print(sha512_crypt.using(rounds=5000).hash(getpass.getpass()))"
 
-# user
+# Example user definition:
 #
 #sysusers_users:
 #  "novak":

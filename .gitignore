@@ -1,2 +1,6 @@
 .idea/
 .vscode/
+.vault_password
+*.retry
+*.pyc
+__pycache__/

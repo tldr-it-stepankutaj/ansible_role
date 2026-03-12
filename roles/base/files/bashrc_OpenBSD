@@ -4,7 +4,7 @@ export EDITOR="vim"
 
 [ -z "$PS1" ] && return; # If not running interactively, don't do anything
 
-# Nastaveni bash promptu
+# Bash prompt settings
 export PS1='\[\033[1;34m\]\t \[\033[0;36m\]\u@\h \[\033[0;32m\]\w \[\033[1;31m\]${?##0}\[\033[1;34m\]\$\[\033[0m\] ';
 export PS2="\[\033[1;34m\]>\[\033[0m\] ";
 export PS4='\[\033[1;34m\]+${BASH_SOURCE}:${LINENO}${FUNCNAME[0]:+ [${FUNCNAME[0]}()]}: \[\033[0m\]';
@@ -50,7 +50,7 @@ function vpnip {
     echo -n "$listvpn"
     echo  ""
     echo  ""
-    echo  "Prvni volna IP:      "$ip_net"."${oktet}""
+    echo  "First available IP:  "$ip_net"."${oktet}""
     break
   done
 }

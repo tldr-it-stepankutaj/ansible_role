@@ -1,0 +1,21 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: debian-network
+    image: debian:bookworm
+    pre_build_image: true
+    command: /bin/systemd
+    privileged: true
+provisioner:
+  name: ansible
+  inventory:
+    host_vars:
+      debian-network:
+        hostname: test-host
+        hosts:
+          "127.0.0.1": "localhost"
+verifier:
+  name: ansible

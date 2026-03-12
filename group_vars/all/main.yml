@@ -1,0 +1,8 @@
+---
+# Map vault variables to role variables
+# This file provides the bridge between encrypted vault values and role defaults
+
+percona_server_root_password: "{{ vault_percona_server_root_password }}"
+percona_server_wsrep_sst_password: "{{ vault_percona_server_wsrep_sst_password }}"
+xtradb_root_password: "{{ vault_xtradb_root_password }}"
+xtradb_sst_password: "{{ vault_xtradb_sst_password }}"

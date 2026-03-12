@@ -2,25 +2,25 @@ syntax on
 set tabstop=2
 set incsearch
 set ignorecase
-set mouse-=a                                        " automaticky zakazuje pouziti mysi
-set shiftwidth=2                                    " odsazení od levého okraje
-set expandtab                                       " vkladá místo 'tab' znaků mezery
-set hlsearch                                        " zvyrazni barvou hledany vzor
-filetype plugin indent on                           " Automaticky detekuje typy souborů
-set shell=/bin/bash                                 " nastaveni shellu pro prikaz `:sh`
-set pastetoggle=<F2>                                " klavesova zkratka pro vkladani textu ze schranky v insert modu(paste mode)
-set showcmd                                         " zobrazovani prikazu
-set showmode                                        " ukazuje mod, ve kterem se pracuje
-set ruler                                           " zobrazeni pozice kurzoru
-set bs=indent,eol,start                             " povolit backspace v insert modu
-set history=10000                                   " pamet historie nastavena na 10 tisic
-set autoread                                        " Detekuje když se změní soubor
+set mouse-=a                                        " disable mouse support
+set shiftwidth=2                                    " indent width
+set expandtab                                       " insert spaces instead of tabs
+set hlsearch                                        " highlight search pattern
+filetype plugin indent on                           " auto-detect file types
+set shell=/bin/bash                                 " shell for :sh command
+set pastetoggle=<F2>                                " toggle paste mode in insert mode
+set showcmd                                         " show commands
+set showmode                                        " show current mode
+set ruler                                           " show cursor position
+set bs=indent,eol,start                             " allow backspace in insert mode
+set history=10000                                   " command history size
+set autoread                                        " detect external file changes
 
-"### NASTAVENI CURSORLINE ###
+"### CURSORLINE SETTINGS ###
 set cursorline
 hi cursorline cterm=NONE ctermbg=8 ctermfg=15
-"### END NASTAVENI CURSORLINE ###
-set background=dark                                 " nastaveni tmaveho pozadi
+"### END CURSORLINE SETTINGS ###
+set background=dark                                 " dark background
 
 nnoremap <silent> <Space> :silent nohl<Bar>echo<CR>
 
@@ -28,7 +28,7 @@ let g:skip_defaults_vim = 1
 
 "set list
 "set listchars=tab:\ \ ,trail:.
-"set nocompatible                                     " vim nebude vi
+"set nocompatible                                     " vim not vi
 "filetype off
 
 
@@ -36,46 +36,46 @@ let g:skip_defaults_vim = 1
 
 ""#PROBLEMATIC AREA can be found in _archive/vim role
 
-""set nocompatible                                     " vim nebude vi
+""set nocompatible                                     " vim not vi
 ""filetype off
 ""
-"""### INSTALACE A ODINSTALACE PLUGINU ###
+"""### PLUGIN INSTALL/UNINSTALL ###
 ""set rtp+=~/.vim/bundle/Vundle.vim
 ""call vundle#begin()
-""Plugin 'VundleVim/Vundle.vim'                       " Instalator pluginu
-"""#Plugin 'xoria256.vim'                               " Color schema
-""Plugin 'airblade/vim-gitgutter'                     " Zobrazovani zmen v gitu pomoci znaku +,-,! v levem panelu podle radku
-""Plugin 'ctrlpvim/ctrlp.vim'                         " Vyhledavání souborů pomocí ctrl+p
-""Plugin 'dkprice/vim-easygrep'                       " Vyhledávání regexp, slov, zanků v souborech
+""Plugin 'VundleVim/Vundle.vim'                       " Plugin manager
+"""#Plugin 'xoria256.vim'                               " Color scheme
+""Plugin 'airblade/vim-gitgutter'                     " Show git changes (+,-,!) in the left gutter
+""Plugin 'ctrlpvim/ctrlp.vim'                         " File search via ctrl+p
+""Plugin 'dkprice/vim-easygrep'                       " Search regexp, words, characters in files
 ""Plugin 'tpope/vim-fugitive'
 ""Plugin 'tpope/vim-git'
 ""Plugin 'scrooloose/nerdtree'
 ""Plugin 'vim-airline'
 ""Plugin 'SearchComplete'
 ""call vundle#end()
-"""### END INSTALACE A ODINSTALACE PLUGINU ###
+"""### END PLUGIN INSTALL/UNINSTALL ###
 ""
-""filetype plugin indent on                           " Automaticky detekuje typy souborů
-""set shell=/bin/bash                       " nastaveni shellu pro prikaz `:sh`
-""set pastetoggle=<F2>                                " klavesova zkratka pro vkladani textu ze schranky v insert modu(paste mode)
-""set showcmd                                         " zobrazovani prikazu
-""set showmode                                        " ukazuje mod, ve kterem se pracuje
-""set ruler                                           " zobrazeni pozice kurzoru
-""set bs=indent,eol,start                             " povolit backspace v insert modu
-""set history=10000                                   " pamet historie nastavena na 10 tisic
-""set shiftwidth=2                                    " odsazení od levého okraje
-""set expandtab                                       " vkladá místo 'tab' znaků mezery
+""filetype plugin indent on                           " auto-detect file types
+""set shell=/bin/bash                       " shell for :sh command
+""set pastetoggle=<F2>                                " toggle paste mode in insert mode
+""set showcmd                                         " show commands
+""set showmode                                        " show current mode
+""set ruler                                           " show cursor position
+""set bs=indent,eol,start                             " allow backspace in insert mode
+""set history=10000                                   " command history size
+""set shiftwidth=2                                    " indent width
+""set expandtab                                       " insert spaces instead of tabs
 ""set tabstop=2
 ""set ignorecase
-""nnoremap <C-a> ggmqvG"+y'q                          " klavesova zkratka ctrl+a = oznaci vsech text
+""nnoremap <C-a> ggmqvG"+y'q                          " ctrl+a = select all text
 ""nnoremap <F3> :NERDTree<CR>
 ""noremap <C-o> :sh<CR>
-""set nu                                              " cislovani radku
-""nmap <C-N><C-N> :set invnumber<CR>                  " klávesová zkratka ctrl+nn = vypnutí nebo zapnutí číslování řádků
-""set mouse=a                                         " automaticky umoznit pouziti mysi
-""set mousehide                                       " skryt kurzor mysi pri psani
-""set autoread                                        " Detekuje když se změní soubor
-""set nofoldenable                                    " Zakazuje zdruzovani bloku
+""set nu                                              " line numbering
+""nmap <C-N><C-N> :set invnumber<CR>                  " ctrl+nn = toggle line numbering
+""set mouse=a                                         " enable mouse support
+""set mousehide                                       " hide mouse cursor while typing
+""set autoread                                        " detect external file changes
+""set nofoldenable                                    " disable code folding
 ""
 ""if has("autocmd")
 ""  " When editing a file, always jump to the last cursor position
@@ -87,15 +87,15 @@ let g:skip_defaults_vim = 1
 ""
 ""set ai
 ""
-""" status radka
+""" status line
 ""if has('statusline')
 ""  set laststatus=2
 ""endif
 ""
-"""### NASTAVENI CURSORLINE ###
+"""### CURSORLINE SETTINGS ###
 ""set cursorline
 ""hi cursorline cterm=NONE ctermbg=8 ctermfg=15
-"""### END NASTAVENI CURSORLINE ###
+"""### END CURSORLINE SETTINGS ###
 ""
 """### HIGHLIGHT EXTRA WHITESPACE ###
 ""set list
@@ -107,15 +107,15 @@ let g:skip_defaults_vim = 1
 ""autocmd BufWinLeave * call clearmatches()
 """### HIGHLIGHT EXTRA WHITESPACE ###
 ""
-"""### NASTAVENI BAREVNE PALETY VIMU ###
-""set background=dark                                 " nastaveni tmaveho pozadi
-"""#colorscheme xoria256                                " nastaveni konkretniho barevneho schema
-""if &t_Co > 2 || has("gui_running")                  " pokud ma terminal vice barev nez 2 a nebo je vim spusten v gui modu:
-""  syntax on                                         " zapne zvyraznovani syntaxe
-""  set hlsearch                                      " zvyrazni barvou hledany vzor
-""  set t_Co=256                                      " nastaveni pro terminal, aby respektoval 256 barev
+"""### COLOR SCHEME SETTINGS ###
+""set background=dark                                 " dark background
+"""#colorscheme xoria256                                " specific color scheme
+""if &t_Co > 2 || has("gui_running")                  " if terminal supports more than 2 colors or gui mode:
+""  syntax on                                         " enable syntax highlighting
+""  set hlsearch                                      " highlight search pattern
+""  set t_Co=256                                      " set terminal to 256 colors
 ""endif
-"""### END NASTAVENI BAREVNE PALETY VIMU ###
+"""### END COLOR SCHEME SETTINGS ###
 ""
 """ ### EASYGREP ###
 ""let g:EasyGrepRecursive = 1

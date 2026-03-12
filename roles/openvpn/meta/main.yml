@@ -1,7 +1,20 @@
 ---
-
-#dependencies:
-#  - { role: sysusers, "sysusers_users": [{"name": "asterisk", "comment": "Asterisk user", "createhome": false}]}
-#  {{ if openvpn_easyrsa_server == 'localhost' }}
-#  - { role: easyrsa, "easyrsa_installdir": "/srv/easy-rsa" }
-#  {{ endif }} 
+galaxy_info:
+  author: stepankutaj
+  description: OpenVPN server with Easy-RSA PKI integration
+  license: MIT
+  min_ansible_version: "2.9"
+  platforms:
+    - name: Debian
+      versions:
+        - bullseye
+        - bookworm
+    - name: EL
+      versions:
+        - "8"
+        - "9"
+  galaxy_tags:
+    - networking
+    - vpn
+    - openvpn
+dependencies: []

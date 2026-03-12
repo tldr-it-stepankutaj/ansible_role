@@ -1,0 +1,26 @@
+---
+galaxy_info:
+  author: stepankutaj
+  description: System package upgrade with optional reboot
+  license: MIT
+  min_ansible_version: "2.9"
+  platforms:
+    - name: Debian
+      versions:
+        - bullseye
+        - bookworm
+    - name: EL
+      versions:
+        - "8"
+        - "9"
+    - name: FreeBSD
+      versions:
+        - all
+    - name: MacOSX
+      versions:
+        - all
+  galaxy_tags:
+    - system
+    - upgrade
+    - packages
+dependencies: []

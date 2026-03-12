@@ -1,0 +1,16 @@
+---
+skip_list:
+  - yaml[line-length]
+  - name[missing]
+
+warn_list:
+  - experimental
+  - role-name[path]
+
+exclude_paths:
+  - .git/
+  - library/
+
+enable_list:
+  - no-changed-when
+  - no-handler

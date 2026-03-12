@@ -2,7 +2,7 @@
 ---
 percona_server_version: 5.7
 
-percona_server_root_password: 'PowerMax60.2'
+percona_server_root_password: 'CHANGE_ME_USE_VAULT'
 
 percona_server_etc_my_cnf: []
 
@@ -73,4 +73,4 @@ percona_server_wsrep_slave_threads: 16
 
 percona_server_wsrep_sst_method: 'xtrabackup-v2'
 percona_server_wsrep_sst_user: 'sst'
-percona_server_wsrep_sst_password: 'PowerMax60.2'
+percona_server_wsrep_sst_password: 'CHANGE_ME_USE_VAULT'

@@ -1,0 +1,36 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  tasks:
+    - name: Check essential packages are installed
+      ansible.builtin.package:
+        name: "{{ item }}"
+        state: present
+      check_mode: true
+      register: pkg_check
+      loop:
+        - git
+        - curl
+        - wget
+        - rsync
+        - sudo
+
+    - name: Assert packages are installed
+      ansible.builtin.assert:
+        that:
+          - not item.changed
+      loop: "{{ pkg_check.results }}"
+      loop_control:
+        label: "{{ item.item }}"
+
+    - name: Check /srv/bin directory exists
+      ansible.builtin.stat:
+        path: /srv/bin
+      register: srv_bin
+
+    - name: Assert /srv/bin exists
+      ansible.builtin.assert:
+        that:
+          - srv_bin.stat.exists
+          - srv_bin.stat.isdir

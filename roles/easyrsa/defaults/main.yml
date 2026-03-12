@@ -1,8 +1,8 @@
 ---
 
-### PRO GENEROVANI CERTIFIKATU JE DEFAULTNE POVOLENO ZADAVANI PODROBNYCH INFORMACI O CERTIFIKATU(PARAMETR 'ORG')
-### PRO PRIPAD, KDY BUDE STACIT GENEROVAT CERTIFIKAT POUZE S UDAJEM 'COMMON NAME' JE POTREBA NASTAVIT
-### PROMENOU 'easyrsa.pki.easyrsa_dn' na 'cn'
+### By default, certificate generation uses detailed organization info (parameter 'ORG').
+### To generate certificates with only 'COMMON NAME', set the variable
+### 'easyrsa.pki.easyrsa_dn' to 'cn'.
 
 # easyrsa:
 #   pki:
@@ -41,7 +41,7 @@
 #           org_unit: 'Obchod'     		# default: 'IT'
 #         
 #
-### ZAKLAD VETSINOU BUDE STACIT NASLEDUJICI:
+### Minimal example (usually sufficient):
 # easyrsa:
 #   pki:
 #     - name: 'pkiname'
@@ -65,7 +65,7 @@
 
 easyrsa_installdir: '/srv/easy-rsa'
 
-### CACERTS DEFAULT DEFINITION ###
+### CA CERTIFICATE DEFAULTS ###
 easyrsa_ca_country_name_default: 'CZ'
 easyrsa_ca_state_default: 'Ceska Republika'
 easyrsa_ca_city_default: 'Hradec Kralove'
@@ -74,7 +74,7 @@ easyrsa_ca_email_default: ''
 easyrsa_ca_org_unit_default: 'IT'
 ### END ###
 
-### SERVERCERTS DEFAULT DEFINITOIN ###
+### SERVER CERTIFICATE DEFAULTS ###
 easyrsa_server_country_name_default: 'CZ'
 easyrsa_server_state_default: 'Ceska Republika'
 easyrsa_server_city_default: 'Hradec Kralove'
@@ -83,7 +83,7 @@ easyrsa_server_email_default: ''
 easyrsa_server_org_unit_default: 'IT'
 ### END ###
 
-### CLIENTCERTS DEFAULT DEFINITOIN ###
+### CLIENT CERTIFICATE DEFAULTS ###
 easyrsa_client_country_name_default: 'CZ'
 easyrsa_client_state_default: 'Ceska Republika'
 easyrsa_client_city_default: 'Hradec Kralove'

@@ -1,0 +1,38 @@
+---
+
+- name: Include OS-specific variables
+  include_tasks: vars.yml
+  tags:
+    - upgrade
+
+- name: Include OS-specific upgrade tasks
+  include_tasks: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution }}.yml"
+        - "{{ ansible_os_family }}.yml"
+      skip: true
+  tags:
+    - upgrade
+
+- name: Check if reboot is required (Linux)
+  stat:
+    path: /var/run/reboot-required
+  register: reboot_required
+  when:
+    - ansible_system == 'Linux'
+    - upgrade_reboot | bool
+  tags:
+    - upgrade
+
+- name: Reboot the server if required
+  reboot:
+    reboot_timeout: "{{ upgrade_reboot_timeout }}"
+    pre_reboot_delay: 5
+    post_reboot_delay: "{{ upgrade_reboot_delay }}"
+    msg: "Reboot initiated by Ansible after system upgrade"
+  when:
+    - upgrade_reboot | bool
+    - (reboot_required.stat.exists | default(false)) or (upgrade_reboot_force | default(false))
+  tags:
+    - upgrade

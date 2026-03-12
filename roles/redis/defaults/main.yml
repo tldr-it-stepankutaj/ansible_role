@@ -1,10 +1,10 @@
 ---
 
-### Nize uvedenou promenou nechavame zakomentovanou jelikoz chceme,
-### aby byla pro kazdy server nastavena jina a zaroven, aby Ansible
-### upozornil na nedefionovanou promenou.
+### This variable is intentionally left undefined so that
+### each server must set its own unique password and Ansible
+### will alert on an undefined variable.
 ###
-### redis_password: Fc5w6446ER56g156GH5445s832iod
+### redis_password: CHANGE_ME_USE_VAULT
 
 redis_databases: 16
 redis_bind: 127.0.0.1

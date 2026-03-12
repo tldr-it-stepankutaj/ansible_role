@@ -1,0 +1,61 @@
+---
+name: Ansible Lint
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install ansible ansible-lint
+
+      - name: Install Ansible collections
+        run: |
+          ansible-galaxy collection install -r requirements.yml
+
+      - name: Run ansible-lint
+        run: |
+          ansible-lint playbooks/
+
+  syntax-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install ansible
+
+      - name: Install Ansible collections
+        run: |
+          ansible-galaxy collection install -r requirements.yml
+
+      - name: Syntax check - common
+        run: |
+          ansible-playbook playbooks/common.yml --syntax-check
+
+      - name: Syntax check - postgresql
+        run: |
+          ansible-playbook playbooks/postgresql.yml --syntax-check
+
+      - name: Syntax check - upgrade
+        run: |
+          ansible-playbook playbooks/upgrade.yml --syntax-check

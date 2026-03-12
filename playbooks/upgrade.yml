@@ -1,0 +1,27 @@
+---
+- name: System package upgrade
+  hosts: all
+  become: true
+  become_method: sudo
+  become_user: root
+  serial: "{{ upgrade_serial | default('100%') }}"
+
+  roles:
+    - { role: upgrade, tags: upgrade }
+
+  post_tasks:
+    - name: Wait for server to come back after reboot
+      wait_for_connection:
+        delay: "{{ upgrade_reboot_delay | default(30) }}"
+        timeout: "{{ upgrade_reboot_timeout | default(300) }}"
+      when:
+        - upgrade_reboot | default(false) | bool
+        - (reboot_required.stat.exists | default(false)) or (upgrade_reboot_force | default(false))
+      tags:
+        - upgrade
+
+    - name: Verify system is operational after upgrade
+      command: uptime
+      changed_when: false
+      tags:
+        - upgrade

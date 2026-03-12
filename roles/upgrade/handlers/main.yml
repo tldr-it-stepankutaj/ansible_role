@@ -1,0 +1,8 @@
+---
+
+- name: reboot server
+  reboot:
+    reboot_timeout: "{{ upgrade_reboot_timeout }}"
+    pre_reboot_delay: 5
+    post_reboot_delay: "{{ upgrade_reboot_delay }}"
+    msg: "Reboot initiated by Ansible after system upgrade"

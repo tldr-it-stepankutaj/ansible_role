@@ -1,0 +1,57 @@
+---
+
+- name: Upgrade all packages (dnf)
+  dnf:
+    name: "*"
+    state: latest
+    update_cache: true
+  register: dnf_upgrade
+  when: ansible_distribution_major_version | int >= 8
+  tags:
+    - upgrade
+
+- name: Upgrade all packages (yum)
+  yum:
+    name: "*"
+    state: latest
+    update_cache: true
+  register: yum_upgrade
+  when: ansible_distribution_major_version | int < 8
+  tags:
+    - upgrade
+
+- name: Remove unused packages
+  dnf:
+    autoremove: true
+  when:
+    - upgrade_autoremove | bool
+    - ansible_distribution_major_version | int >= 8
+  tags:
+    - upgrade
+
+- name: Clean package cache
+  command: "{{ 'dnf' if ansible_distribution_major_version | int >= 8 else 'yum' }} clean all"
+  when: upgrade_clean_cache | bool
+  changed_when: false
+  tags:
+    - upgrade
+
+- name: Check if reboot is required (RedHat)
+  command: needs-restarting -r
+  register: reboot_check
+  failed_when: false
+  changed_when: false
+  when: upgrade_reboot | bool
+  tags:
+    - upgrade
+
+- name: Set reboot required fact (RedHat)
+  set_fact:
+    reboot_required:
+      stat:
+        exists: "{{ reboot_check.rc | default(0) == 1 }}"
+  when:
+    - upgrade_reboot | bool
+    - ansible_os_family == 'RedHat'
+  tags:
+    - upgrade

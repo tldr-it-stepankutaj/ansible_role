@@ -1,0 +1,14 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  tasks:
+    - name: Check hostname is set
+      ansible.builtin.command: hostname
+      register: hostname_result
+      changed_when: false
+
+    - name: Assert hostname is set
+      ansible.builtin.assert:
+        that:
+          - hostname_result.stdout == 'test-host'

@@ -16,9 +16,9 @@ nftables:
 
 # nftables:
 #   tcp_ports: [ 80, 443 ]
-# seznam TCP portu k povoleni na vstupu
+# List of TCP ports to allow on input
 #
 #   udp_ports: [ 80, 443 ]
-# seznam UDP portu k povoleni na vstupu
+# List of UDP ports to allow on input
 #
 

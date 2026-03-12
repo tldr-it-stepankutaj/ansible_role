@@ -1,0 +1,19 @@
+---
+
+# Whether to reboot the server after upgrade (if required)
+upgrade_reboot: false
+
+# Seconds to wait before checking if the server is back after reboot
+upgrade_reboot_delay: 30
+
+# Seconds to wait for the server to come back after reboot
+upgrade_reboot_timeout: 300
+
+# Whether to perform dist-upgrade (Debian) or just regular upgrade
+upgrade_dist_upgrade: true
+
+# Whether to remove unused packages after upgrade
+upgrade_autoremove: true
+
+# Whether to clean package cache after upgrade
+upgrade_clean_cache: true

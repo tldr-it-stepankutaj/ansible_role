@@ -1,0 +1,62 @@
+# Ansible Inventory Example
+# Copy this file to 'hosts' and adjust to your environment
+#
+# Usage:
+#   ansible-playbook playbooks/common.yml
+#   ansible-playbook playbooks/upgrade.yml --limit webservers
+#   ansible-playbook playbooks/upgrade.yml -e upgrade_reboot=true
+
+# =============================
+# Web Servers
+# =============================
+[webservers]
+web01.example.com
+web02.example.com
+
+# =============================
+# Database Servers
+# =============================
+[dbservers]
+db01.example.com
+
+[pg]
+pg01.example.com
+
+# =============================
+# Monitoring
+# =============================
+[monitoring]
+mon01.example.com
+
+# =============================
+# VPN Servers
+# =============================
+[vpn]
+vpn01.example.com
+
+# =============================
+# All Linux Servers
+# =============================
+[linux:children]
+webservers
+dbservers
+pg
+monitoring
+vpn
+
+# =============================
+# Group Variables
+# =============================
+[linux:vars]
+ansible_user=deploy
+ansible_become=true
+
+[webservers:vars]
+upgrade_reboot=false
+
+[dbservers:vars]
+upgrade_reboot=false
+upgrade_serial=1
+
+[pg:vars]
+ansible_python_interpreter=/usr/bin/python3

@@ -19,10 +19,10 @@ ip6tables:
 #   tcp_ports: [ 80, 443 ]
 #   banned:
 #     - 192.168.1.1
-# seznam TCP portu k povoleni na vstupu
+# List of TCP ports to allow on input
 #
 #   udp_ports: [ 80, 443 ]
-# seznam UDP portu k povoleni na vstupu
+# List of UDP ports to allow on input
 #
 #   custom_rules: [
 #     '-A INPUT -p tcp -m tcp -s 10.5.126.13 --dport 873 -j ACCEPT',

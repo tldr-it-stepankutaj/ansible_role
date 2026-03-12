@@ -1,0 +1,8 @@
+---
+# Encrypt this file with: ansible-vault encrypt group_vars/all/vault.yml
+# All sensitive values should be defined here and referenced via vault_ prefix
+
+vault_percona_server_root_password: 'CHANGE_ME'
+vault_percona_server_wsrep_sst_password: 'CHANGE_ME'
+vault_xtradb_root_password: 'CHANGE_ME'
+vault_xtradb_sst_password: 'CHANGE_ME'

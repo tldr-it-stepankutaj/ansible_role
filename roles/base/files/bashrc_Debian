@@ -3,19 +3,19 @@
 [ -f /etc/profile ] && . /etc/profile;
 ### END ###
 
-export PAGER="less -isM"        # defaultni strankovac
-export LESS="-isMR --shift 5"   # defaultni strankovac, parametry pro man
-export EDITOR="vim"             # defaultni textovy editor
+export PAGER="less -isM"        # default pager
+export LESS="-isMR --shift 5"   # default pager, man parameters
+export EDITOR="vim"             # default text editor
 
-[ -z "$PS1" ] && return         # pokud neni interaktivni rezim, nic nedelat
+[ -z "$PS1" ] && return         # if not interactive, do nothing
 
-### NASTAVENI TERMINALU PRO 256 ODSTINU BAREV ###
+### TERMINAL 256 COLOR SUPPORT ###
 case "$TERM" in
   xterm*) TERM=xterm-256color
 esac
 ### END ###
 
-#[ $TERM != "xterm-256color" ] && exec screen -q ### defaultni terminal screen
+#[ $TERM != "xterm-256color" ] && exec screen -q ### default terminal screen
 
 ##### SETTING BASH PROMPT #####
 export PS1="\[\033[1;34m\]\t \[\033[0;36m\]\u@\H \[\033[0;32m\]\w \[\033[1;31m\]\${?##0}\[\033[1;34m\]\\\$\[\033[0m\] ";
@@ -48,11 +48,11 @@ alias cp='cp -i'
 alias mv='mv -i'
 alias h='history'
 alias ducks='du -cks *|sort -rn|head -11'
-alias pocasi='curl wttr.in/Brno'
+alias weather='curl wttr.in/Brno'
 alias gita='git add . && git commit -a -m "autocommit"'
 alias g='grep'
 
-### ZMENY CESTY ###
+### DIRECTORY SHORTCUTS ###
 alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
@@ -61,7 +61,7 @@ alias ......="cd ../../../../.."
 alias .......="cd ../../../../../.."
 ### END ###
 export LC_ALL=en_US.UTF-8
-### GENEROVANI HESEL ###
+### PASSWORD GENERATION ###
 pwg() { env LC_CTYPE=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c${1:-32}; echo; }
 pwgredis() { env LC_CTYPE=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c${1:-45}; echo; }
 pwg1()  { env LC_CTYPE=C tr -dc \''_A-Za-z0-9`~!@#"$%^*=+\[]{}.,:?/-' < /dev/urandom | head -c${1:-32}; echo; }
