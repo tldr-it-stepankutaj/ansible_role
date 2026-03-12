@@ -1,14 +1,14 @@
-- hosts: all,!pg
-  become: True
-  become_method: 'sudo'
-  become_user: 'root'
-  vars_files:
-    #- "{{ sudosecret }}"
+---
+- name: Base infrastructure setup
+  hosts: all,!pg
+  become: true
+  become_method: ansible.builtin.sudo
+  become_user: root
 
   roles:
-    - {role: motd, tags: motd}
-    - {role: network, tags: network}
-    - {role: ssh, tags: ssh}
-    - {role: base, tags: base}
-    - {role: sysusers, tags: sysusers}
-    - {role: sudo, tags: sudo}
+    - { role: motd, tags: motd }
+    - { role: network, tags: network }
+    - { role: ssh, tags: ssh }
+    - { role: base, tags: base }
+    - { role: sysusers, tags: sysusers }
+    - { role: sudo, tags: sudo }

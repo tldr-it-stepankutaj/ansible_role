@@ -1,101 +1,112 @@
 ---
-- name: Install required packages
-  package:
-    name: "{{ item }}"
+- name: Include OS-specific variables
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_os_family }}.yml"
+  tags:
+    - postgresql
+
+- name: Include OS-specific setup tasks
+  ansible.builtin.include_tasks: "{{ item }}"
+  with_first_found:
+    - "setup-{{ ansible_os_family }}.yml"
+  tags:
+    - postgresql
+
+- name: Install PostgreSQL packages
+  ansible.builtin.package:
+    name: "{{ postgresql_packages }}"
     state: present
-  loop: "{{ postgresql_packages }}"
-  vars:
-    postgresql_packages:
-      - "{{ 'python3-psycopg2' if ansible_os_family == 'RedHat' else 'python3-psycopg2' }}"
+  tags:
+    - postgresql
 
-- name: Add PostgreSQL repo (RedHat)
-  when: ansible_os_family == "RedHat"
-  shell: |
-    dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
-  args:
-    warn: no
-
-- name: Download PostgreSQL apt key (Debian)
-  when: ansible_os_family == "Debian"
-  get_url:
-    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
-    dest: /etc/apt/trusted.gpg.d/postgresql-archive-keyring.gpg
-    mode: '0644'
-
-- name: Add PostgreSQL repo (Debian)
-  when: ansible_os_family == "Debian"
-  apt_repository:
-    repo: "deb http://apt.postgresql.org/pub/repos/apt {{ ansible_distribution_release }}-pgdg main"
-    filename: "pgdg.list"
-    state: present
-
-- name: Disable built-in PostgreSQL module (RedHat)
-  when: ansible_os_family == "RedHat"
-  shell: dnf -qy module disable postgresql
-  args:
-    warn: no
-
-- name: Update apt cache (Debian)
-  when: ansible_os_family == "Debian"
-  apt:
-    update_cache: yes
-
-- name: Install PostgreSQL server and contrib packages
-  package:
-    name:
-      - "{{ 'postgresql' + postgresql_version + '-server' if ansible_os_family == 'RedHat' else 'postgresql-' + postgresql_version }}"
-      - "{{ 'postgresql' + postgresql_version + '-contrib' if ansible_os_family == 'RedHat' else 'postgresql-contrib-' + postgresql_version }}"
-    state: present
-  notify:
-    - Enable Postgresql
+- name: Check if PostgreSQL database is initialized (RedHat)
+  ansible.builtin.stat:
+    path: "{{ postgresql_data_dir }}/PG_VERSION"
+  register: postgresql_pgversion
+  when: ansible_os_family == 'RedHat'
+  tags:
+    - postgresql
 
 - name: Initialize PostgreSQL database (RedHat)
-  when: ansible_os_family == "RedHat"
-  shell: "/usr/pgsql-{{ postgresql_version }}/bin/postgresql-{{ postgresql_version }}-setup initdb"
+  ansible.builtin.command: "{{ postgresql_bin_dir }}/postgresql-{{ postgresql_version }}-setup initdb"
+  when:
+    - ansible_os_family == 'RedHat'
+    - not postgresql_pgversion.stat.exists
+  changed_when: true
+  tags:
+    - postgresql
 
-- name: Ensure PostgreSQL is listening on *
-  lineinfile:
-    dest: "{{ postgresql_conf }}"
-    regexp: '^listen_addresses\s*='
-    line: "listen_addresses = '*'"
+- name: Ensure PostgreSQL listen_addresses is configured
+  ansible.builtin.lineinfile:
+    dest: "{{ postgresql_conf_dir }}/postgresql.conf"
+    regexp: '^#?listen_addresses\s*='
+    line: "listen_addresses = '{{ postgresql_listen_addresses }}'"
     state: present
-  vars:
-    postgresql_conf: "{{ '/var/lib/pgsql/' + postgresql_version + '/data/postgresql.conf' if ansible_os_family == 'RedHat' else '/etc/postgresql/' + postgresql_version + '/main/postgresql.conf' }}"
-  notify: Restart Postgresql
+  notify: Restart postgresql
+  tags:
+    - postgresql
 
-- name: Add new configuration to pg_hba.conf
-  blockinfile:
-    dest: "{{ pg_hba_conf }}"
+- name: Ensure PostgreSQL port is configured
+  ansible.builtin.lineinfile:
+    dest: "{{ postgresql_conf_dir }}/postgresql.conf"
+    regexp: '^#?port\s*='
+    line: "port = {{ postgresql_port }}"
+    state: present
+  notify: Restart postgresql
+  tags:
+    - postgresql
+
+- name: Apply extra PostgreSQL configuration
+  ansible.builtin.lineinfile:
+    dest: "{{ postgresql_conf_dir }}/postgresql.conf"
+    regexp: "^#?{{ item.key }}\\s*="
+    line: "{{ item.key }} = {{ item.value }}"
+    state: present
+  loop: "{{ postgresql_extra_config | dict2items }}"
+  notify: Restart postgresql
+  when: postgresql_extra_config | length > 0
+  tags:
+    - postgresql
+
+- name: Configure pg_hba.conf entries
+  ansible.builtin.blockinfile:
+    dest: "{{ postgresql_conf_dir }}/pg_hba.conf"
     block: |
-      host    all             all             0.0.0.0/0                md5
-      host    all             all             ::/0                     md5
-  vars:
-    pg_hba_conf: "{{ '/var/lib/pgsql/' + postgresql_version + '/data/pg_hba.conf' if ansible_os_family == 'RedHat' else '/etc/postgresql/' + postgresql_version + '/main/pg_hba.conf' }}"
-  notify: Restart Postgresql
+      {% for entry in postgresql_hba_entries %}
+      {{ entry }}
+      {% endfor %}
+    marker: "# {mark} ANSIBLE MANAGED BLOCK"
+  notify: Restart postgresql
+  tags:
+    - postgresql
 
-- name: Change peer identification to trust
-  shell: "/bin/sed -i '/^local/s/peer/trust/' {{ pg_hba_conf }}"
-  vars:
-    pg_hba_conf: "{{ '/var/lib/pgsql/' + postgresql_version + '/data/pg_hba.conf' if ansible_os_family == 'RedHat' else '/etc/postgresql/' + postgresql_version + '/main/pg_hba.conf' }}"
-  args:
-    warn: no
-  notify: Restart Postgresql
+- name: Change local auth from peer to trust
+  ansible.builtin.replace:
+    path: "{{ postgresql_conf_dir }}/pg_hba.conf"
+    regexp: '^(local\s+\S+\s+\S+\s+)peer'
+    replace: '\1trust'
+  when: postgresql_local_auth_trust | bool
+  notify: Restart postgresql
+  tags:
+    - postgresql
 
-- name: Start PostgreSQL service
-  systemd:
+- name: Start and enable PostgreSQL service
+  ansible.builtin.systemd:
     name: "{{ postgresql_service }}"
     state: started
-  notify:
-    - Enable Postgresql
-  vars:
-    postgresql_service: "{{ 'postgresql-' + postgresql_version if ansible_os_family == 'RedHat' else 'postgresql' }}"
+    enabled: true
+  tags:
+    - postgresql
 
-- name: Create a Superuser PostgreSQL database user
-  become: yes
+- name: Create PostgreSQL admin user
+  become: true
   become_user: postgres
-  postgresql_user:
-    name: "{{ postgres_root_user }}"
-    password: "{{ postgres_root_pass }}"
+  community.postgresql.postgresql_user:
+    name: "{{ postgresql_admin_user }}"
+    password: "{{ postgresql_admin_password }}"
     role_attr_flags: CREATEDB,SUPERUSER,CREATEROLE
-    encrypted: yes
+    encrypted: true
     state: present
+  tags:
+    - postgresql

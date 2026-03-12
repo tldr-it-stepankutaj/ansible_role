@@ -1,4 +1,21 @@
 ---
-postgres_root_user: root
-postgres_root_pass: GQt5MTyVPuf9vsVWoWDT9YCn
-postgresql_version: 17
+postgresql_version: "17"
+
+# Superuser account created after installation
+postgresql_admin_user: root
+postgresql_admin_password: "CHANGE_ME_USE_VAULT"
+
+# Listen on all interfaces by default
+postgresql_listen_addresses: "*"
+postgresql_port: 5432
+
+# pg_hba.conf entries (appended via blockinfile)
+postgresql_hba_entries:
+  - "host    all             all             0.0.0.0/0                md5"
+  - "host    all             all             ::/0                     md5"
+
+# Whether to change local auth from peer to trust
+postgresql_local_auth_trust: true
+
+# Extra postgresql.conf settings (key: value)
+postgresql_extra_config: {}

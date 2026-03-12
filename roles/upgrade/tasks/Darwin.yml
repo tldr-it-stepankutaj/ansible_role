@@ -1,20 +1,20 @@
 ---
 
 - name: Update Homebrew
-  homebrew:
+  community.general.homebrew:
     update_homebrew: true
   tags:
     - upgrade
 
 - name: Upgrade all Homebrew packages
-  homebrew:
+  community.general.homebrew:
     upgrade_all: true
-  register: brew_upgrade
+  register: upgrade_brew_result
   tags:
     - upgrade
 
 - name: Clean Homebrew cache
-  command: brew cleanup
+  ansible.builtin.command: brew cleanup
   when: upgrade_clean_cache | bool
   changed_when: false
   tags:

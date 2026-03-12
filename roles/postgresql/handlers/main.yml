@@ -1,14 +1,5 @@
 ---
-- name: Restart Postgresql
-  systemd:
+- name: Restart postgresql
+  ansible.builtin.systemd:
     name: "{{ postgresql_service }}"
     state: restarted
-  vars:
-    postgresql_service: "{{ 'postgresql-' + postgresql_version if ansible_os_family == 'RedHat' else 'postgresql' }}"
-
-- name: Enable Postgresql
-  systemd:
-    name: "{{ postgresql_service }}"
-    enabled: yes
-  vars:
-    postgresql_service: "{{ 'postgresql-' + postgresql_version if ansible_os_family == 'RedHat' else 'postgresql' }}"

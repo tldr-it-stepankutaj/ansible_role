@@ -1,6 +1,6 @@
 ---
 - name: Install and set up PostgreSQL 17
   hosts: pg
-  become: yes
+  become: true
   roles:
     - postgresql

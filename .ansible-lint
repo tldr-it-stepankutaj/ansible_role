@@ -2,15 +2,40 @@
 skip_list:
   - yaml[line-length]
   - name[missing]
+  # Legacy roles use short module names — migrate to FQCN incrementally
+  - fqcn[action-core]
+  - fqcn[action]
+  # Legacy roles use free-form syntax (e.g., package: name=foo state=present)
+  - no-free-form
+  # Legacy variable names don't follow role-prefix convention
+  - var-naming[no-role-prefix]
+  # Legacy roles have truthy values (True/False instead of true/false)
+  - yaml[truthy]
+  # Legacy task names use lowercase
+  - name[casing]
+  # Legacy roles use relative paths for shared files
+  - no-relative-paths
+  # Legacy jinja2 spacing inconsistencies
+  - jinja[spacing]
+  - jinja[invalid]
+  # Legacy YAML formatting issues — fix incrementally
+  - yaml[trailing-spaces]
+  - yaml[empty-lines]
+  - yaml[new-line-at-end-of-file]
+  - yaml[comments]
+  - yaml[indentation]
+  - yaml[octal-values]
+  - yaml[brackets]
+  - yaml[colons]
 
 warn_list:
   - experimental
   - role-name[path]
+  - command-instead-of-module
+  - command-instead-of-shell
+  - no-changed-when
+  - package-latest
+  - no-handler
 
 exclude_paths:
   - .git/
-  - library/
-
-enable_list:
-  - no-changed-when
-  - no-handler

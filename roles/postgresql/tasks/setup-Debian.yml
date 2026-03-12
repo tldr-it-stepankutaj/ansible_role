@@ -1,0 +1,22 @@
+---
+- name: Download PostgreSQL apt key
+  ansible.builtin.get_url:
+    url: "{{ postgresql_repo_key_url }}"
+    dest: "{{ postgresql_repo_key_dest }}"
+    mode: "0644"
+  tags:
+    - postgresql
+
+- name: Add PostgreSQL apt repository
+  ansible.builtin.apt_repository:
+    repo: "deb http://apt.postgresql.org/pub/repos/apt {{ ansible_distribution_release }}-pgdg main"
+    filename: pgdg
+    state: present
+  tags:
+    - postgresql
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+  tags:
+    - postgresql

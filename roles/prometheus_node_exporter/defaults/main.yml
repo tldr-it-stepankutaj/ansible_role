@@ -1,0 +1,13 @@
+---
+# PostgreSQL exporter settings
+prometheus_postgres_exporter_user: postgres_exporter
+prometheus_postgres_exporter_password: "CHANGE_ME_USE_VAULT"
+prometheus_postgres_exporter_host: localhost
+prometheus_postgres_exporter_port: 5432
+prometheus_postgres_exporter_dbname: postgres
+prometheus_postgres_exporter_sslmode: disable
+
+# MySQL exporter settings
+prometheus_mysqld_exporter_user: prometheus
+prometheus_mysqld_exporter_password: "CHANGE_ME_USE_VAULT"
+prometheus_mysqld_exporter_socket: /run/mysqld/mysqld.sock

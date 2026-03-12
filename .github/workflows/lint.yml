@@ -26,6 +26,10 @@ jobs:
         run: |
           ansible-galaxy collection install -r requirements.yml
 
+      - name: Create dummy vault password file
+        run: |
+          echo 'ci-dummy-vault-password' > .vault_password
+
       - name: Run ansible-lint
         run: |
           ansible-lint playbooks/
@@ -47,6 +51,10 @@ jobs:
       - name: Install Ansible collections
         run: |
           ansible-galaxy collection install -r requirements.yml
+
+      - name: Create dummy vault password file
+        run: |
+          echo 'ci-dummy-vault-password' > .vault_password
 
       - name: Syntax check - common
         run: |

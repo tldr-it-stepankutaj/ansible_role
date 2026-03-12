@@ -4,7 +4,7 @@
 # (\\\\d to mean \d), and escape newlines too.
 ARGS=""
 
-DATA_SOURCE_NAME="prometheus:PowerMax60.2@unix(/run/mysqld/mysqld.sock)/"
+DATA_SOURCE_NAME="{{ prometheus_mysqld_exporter_user }}:{{ prometheus_mysqld_exporter_password }}@unix({{ prometheus_mysqld_exporter_socket }})/"
 
 ### Database authentication
 #

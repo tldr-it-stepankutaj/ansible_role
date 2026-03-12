@@ -1,14 +1,14 @@
 ---
 
 - name: Upgrade all packages
-  command: pkg_add -u
-  register: pkg_upgrade
-  changed_when: pkg_upgrade.stdout | length > 0
+  ansible.builtin.command: pkg_add -u
+  register: upgrade_pkg_result
+  changed_when: upgrade_pkg_result.stdout | length > 0
   tags:
     - upgrade
 
 - name: Clean package cache
-  command: pkg_delete -a
+  ansible.builtin.command: pkg_delete -a
   when: upgrade_clean_cache | bool
   changed_when: false
   failed_when: false

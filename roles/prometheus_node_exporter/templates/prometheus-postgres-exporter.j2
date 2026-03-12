@@ -5,7 +5,7 @@
 # DATA_SOURCE_NAME='postgresql://login:password@hostname:port/'
 # DATA_SOURCE_NAME='user=prometheus host=/run/postgresql dbname=postgres'
 #DATA_SOURCE_NAME=''
-DATA_SOURCE_NAME=postgresql://postgres_exporter:PowerMax60.2@localhost:5432/postgres?sslmode=disable
+DATA_SOURCE_NAME=postgresql://{{ prometheus_postgres_exporter_user }}:{{ prometheus_postgres_exporter_password }}@{{ prometheus_postgres_exporter_host }}:{{ prometheus_postgres_exporter_port }}/{{ prometheus_postgres_exporter_dbname }}?sslmode={{ prometheus_postgres_exporter_sslmode }}
 
 # Set the command-line arguments to pass to the server.
 # Due to shell escaping, to pass backslashes for regexes, you need to double

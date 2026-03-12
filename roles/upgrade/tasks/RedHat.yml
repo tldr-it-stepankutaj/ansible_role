@@ -1,27 +1,27 @@
 ---
 
-- name: Upgrade all packages (dnf)
-  dnf:
+- name: Upgrade all packages (dnf)  # noqa: package-latest
+  ansible.builtin.dnf:
     name: "*"
     state: latest
     update_cache: true
-  register: dnf_upgrade
+  register: upgrade_dnf_result
   when: ansible_distribution_major_version | int >= 8
   tags:
     - upgrade
 
-- name: Upgrade all packages (yum)
-  yum:
+- name: Upgrade all packages (yum)  # noqa: package-latest
+  ansible.builtin.yum:
     name: "*"
     state: latest
     update_cache: true
-  register: yum_upgrade
+  register: upgrade_yum_result
   when: ansible_distribution_major_version | int < 8
   tags:
     - upgrade
 
 - name: Remove unused packages
-  dnf:
+  ansible.builtin.dnf:
     autoremove: true
   when:
     - upgrade_autoremove | bool
@@ -30,15 +30,15 @@
     - upgrade
 
 - name: Clean package cache
-  command: "{{ 'dnf' if ansible_distribution_major_version | int >= 8 else 'yum' }} clean all"
+  ansible.builtin.command: "{{ 'dnf' if ansible_distribution_major_version | int >= 8 else 'yum' }} clean all"
   when: upgrade_clean_cache | bool
   changed_when: false
   tags:
     - upgrade
 
 - name: Check if reboot is required (RedHat)
-  command: needs-restarting -r
-  register: reboot_check
+  ansible.builtin.command: needs-restarting -r
+  register: upgrade_reboot_check
   failed_when: false
   changed_when: false
   when: upgrade_reboot | bool
@@ -46,10 +46,10 @@
     - upgrade
 
 - name: Set reboot required fact (RedHat)
-  set_fact:
+  ansible.builtin.set_fact:
     reboot_required:
       stat:
-        exists: "{{ reboot_check.rc | default(0) == 1 }}"
+        exists: "{{ upgrade_reboot_check.rc | default(0) == 1 }}"
   when:
     - upgrade_reboot | bool
     - ansible_os_family == 'RedHat'

@@ -1,21 +1,21 @@
 ---
 
 - name: Update apt cache
-  apt:
+  ansible.builtin.apt:
     update_cache: true
     cache_valid_time: 3600
   tags:
     - upgrade
 
 - name: Upgrade all packages
-  apt:
+  ansible.builtin.apt:
     upgrade: "{{ 'dist' if upgrade_dist_upgrade else 'safe' }}"
-  register: apt_upgrade
+  register: upgrade_apt_result
   tags:
     - upgrade
 
 - name: Remove unused packages
-  apt:
+  ansible.builtin.apt:
     autoremove: true
     purge: true
   when: upgrade_autoremove | bool
@@ -23,15 +23,8 @@
     - upgrade
 
 - name: Clean apt cache
-  apt:
+  ansible.builtin.apt:
     autoclean: true
   when: upgrade_clean_cache | bool
-  tags:
-    - upgrade
-
-- name: Display upgraded packages
-  debug:
-    msg: "{{ apt_upgrade.stdout_lines | default([]) }}"
-  when: apt_upgrade.changed
   tags:
     - upgrade
