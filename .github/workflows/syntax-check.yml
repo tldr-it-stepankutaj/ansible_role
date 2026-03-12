@@ -1,5 +1,5 @@
 ---
-name: Ansible Lint
+name: Syntax Check
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
     branches: [master, main]
 
 jobs:
-  lint:
+  syntax-check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -20,7 +20,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install ansible ansible-lint
+          pip install ansible
 
       - name: Install Ansible collections
         run: |
@@ -30,6 +30,14 @@ jobs:
         run: |
           echo 'ci-dummy-vault-password' > .vault_password
 
-      - name: Run ansible-lint
+      - name: Syntax check - common
         run: |
-          ansible-lint playbooks/
+          ansible-playbook playbooks/common.yml --syntax-check
+
+      - name: Syntax check - postgresql
+        run: |
+          ansible-playbook playbooks/postgresql.yml --syntax-check
+
+      - name: Syntax check - upgrade
+        run: |
+          ansible-playbook playbooks/upgrade.yml --syntax-check

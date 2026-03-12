@@ -1,6 +1,11 @@
 # Ansible Infrastructure
 
-Ansible configuration management for automating Linux server provisioning, hardening, and upgrades. Supports Debian, RedHat, OpenBSD, and FreeBSD.
+[![Ansible Lint](https://github.com/tldr-it-stepankutaj/ansible_role/actions/workflows/lint.yml/badge.svg)](https://github.com/tldr-it-stepankutaj/ansible_role/actions/workflows/lint.yml)
+[![Syntax Check](https://github.com/tldr-it-stepankutaj/ansible_role/actions/workflows/syntax-check.yml/badge.svg)](https://github.com/tldr-it-stepankutaj/ansible_role/actions/workflows/syntax-check.yml)
+![Ansible](https://img.shields.io/badge/Ansible-%E2%89%A52.9-blue?logo=ansible)
+![License](https://img.shields.io/badge/License-MIT-green)
+
+Ansible configuration management for automating Linux server provisioning, hardening, and upgrades. Supports Debian, RedHat, OpenBSD, FreeBSD, and macOS.
 
 ## Quick Start
 
