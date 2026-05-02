@@ -4,3 +4,5 @@
 *.retry
 *.pyc
 __pycache__/
+.venv/
+hosts
