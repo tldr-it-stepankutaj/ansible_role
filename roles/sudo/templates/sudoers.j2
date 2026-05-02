@@ -1,4 +1,4 @@
-{{ ansible_managed }}
+# {{ ansible_managed }}
 
 Defaults          {% if sudoers_requiretty | default(True) == False %}!{% endif %}requiretty
 Defaults          secure_path = {{ sudo_secure_path | default('/usr/local/bin:/usr/local/sbin:/sbin:/bin:/usr/sbin:/usr/bin') }}
